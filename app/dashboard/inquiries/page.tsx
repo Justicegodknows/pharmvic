@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import Link from 'next/link'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import type { ReactElement } from 'react'
@@ -77,7 +78,7 @@ export default async function InquiriesPage(): Promise<ReactElement> {
                     <p className="text-muted-foreground">No inquiries yet.</p>
                     {isVendor && (
                         <p className="mt-1 text-sm text-muted-foreground">
-                            Browse the <a href="/marketplace" className="text-primary hover:underline">marketplace</a> to find suppliers.
+                            Browse the <Link href="/marketplace" className="text-primary hover:underline">marketplace</Link> to find suppliers.
                         </p>
                     )}
                 </Card>

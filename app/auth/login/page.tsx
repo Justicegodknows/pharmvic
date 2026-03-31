@@ -6,9 +6,9 @@ import { Input } from '@/components/ui/input'
 import { Card } from '@/components/ui/card'
 import Link from 'next/link'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { useState, type FormEvent, type ReactElement } from 'react'
+import { Suspense, useState, type FormEvent, type ReactElement } from 'react'
 
-export default function LoginPage(): ReactElement {
+function LoginForm(): ReactElement {
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
     const [error, setError] = useState<string | null>(null)
@@ -98,5 +98,13 @@ export default function LoginPage(): ReactElement {
                 </p>
             </Card>
         </div>
+    )
+}
+
+export default function LoginPage(): ReactElement {
+    return (
+        <Suspense>
+            <LoginForm />
+        </Suspense>
     )
 }

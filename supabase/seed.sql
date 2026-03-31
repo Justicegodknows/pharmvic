@@ -1,0 +1,138 @@
+-- Seed data: German pharmaceutical suppliers for PharmConnect marketplace
+-- Run after migrations: psql -f seed.sql or via Supabase dashboard
+
+-- Note: These are demonstration suppliers. In production, supplier accounts
+-- would be created through the registration flow with real auth.users entries.
+-- For seeding, we insert directly into suppliers table (bypassing RLS via service role).
+
+-- Supplier 1: BerlinPharma GmbH
+insert into public.suppliers (id, user_id, company_name, country, description, address, website, founded_year, export_markets, certifications, verified)
+values (
+  'a1000000-0000-0000-0000-000000000001',
+  '00000000-0000-0000-0000-000000000000', -- placeholder; override with real user_id if seeding with auth
+  'BerlinPharma GmbH',
+  'Germany',
+  'Leading German manufacturer of antibiotics and cardiovascular medications. ISO-certified production facilities with 40+ years of pharmaceutical manufacturing excellence.',
+  'Pharmastraße 12, 10115 Berlin, Germany',
+  'https://example.com/berlinpharma',
+  1983,
+  ARRAY['Nigeria', 'Ghana', 'Kenya', 'South Africa', 'Egypt'],
+  ARRAY['GMP', 'WHO-GMP', 'ISO 9001', 'EU GMP'],
+  true
+) on conflict (id) do nothing;
+
+-- Supplier 2: MunichMed AG
+insert into public.suppliers (id, user_id, company_name, country, description, address, website, founded_year, export_markets, certifications, verified)
+values (
+  'a1000000-0000-0000-0000-000000000002',
+  '00000000-0000-0000-0000-000000000000',
+  'MunichMed AG',
+  'Germany',
+  'Specializing in analgesics and anti-inflammatory medications. Our Munich-based facility serves pharmaceutical distributors across Africa and the Middle East.',
+  'Medizinweg 45, 80331 München, Germany',
+  'https://example.com/munichmed',
+  1996,
+  ARRAY['Nigeria', 'Tanzania', 'UAE', 'Saudi Arabia'],
+  ARRAY['GMP', 'CE Mark', 'ISO 9001', 'ISO 14001'],
+  true
+) on conflict (id) do nothing;
+
+-- Supplier 3: HamburgBio GmbH
+insert into public.suppliers (id, user_id, company_name, country, description, address, website, founded_year, export_markets, certifications, verified)
+values (
+  'a1000000-0000-0000-0000-000000000003',
+  '00000000-0000-0000-0000-000000000000',
+  'HamburgBio GmbH',
+  'Germany',
+  'Cutting-edge biologics and vaccine manufacturer. PEI-approved facility producing high-quality immunological products for global distribution.',
+  'Biopark 7, 20457 Hamburg, Germany',
+  'https://example.com/hamburgbio',
+  2005,
+  ARRAY['Nigeria', 'Ethiopia', 'Morocco', 'India'],
+  ARRAY['WHO-GMP', 'EU GMP', 'PEI Approved', 'ISO 9001'],
+  true
+) on conflict (id) do nothing;
+
+-- Supplier 4: RheinDiagnostik AG
+insert into public.suppliers (id, user_id, company_name, country, description, address, website, founded_year, export_markets, certifications, verified)
+values (
+  'a1000000-0000-0000-0000-000000000004',
+  '00000000-0000-0000-0000-000000000000',
+  'RheinDiagnostik AG',
+  'Germany',
+  'Premier manufacturer of diagnostic reagents and medical devices. Serving hospitals and laboratories in over 30 countries with quality-assured products.',
+  'Diagnostikplatz 3, 50667 Köln, Germany',
+  'https://example.com/rheindiagnostik',
+  2001,
+  ARRAY['Nigeria', 'Cameroon', 'Senegal', 'Côte d''Ivoire'],
+  ARRAY['CE Mark', 'ISO 13485', 'ISO 9001', 'GMP'],
+  true
+) on conflict (id) do nothing;
+
+-- Supplier 5: FrankfurtAPI GmbH
+insert into public.suppliers (id, user_id, company_name, country, description, address, website, founded_year, export_markets, certifications, verified)
+values (
+  'a1000000-0000-0000-0000-000000000005',
+  '00000000-0000-0000-0000-000000000000',
+  'FrankfurtAPI GmbH',
+  'Germany',
+  'Specialist producer of Active Pharmaceutical Ingredients (APIs). GMP-compliant synthesis of bulk pharmaceutical chemicals for global markets.',
+  'Chemiepark 22, 60311 Frankfurt am Main, Germany',
+  'https://example.com/frankfurtapi',
+  1990,
+  ARRAY['Nigeria', 'Bangladesh', 'Indonesia', 'Brazil'],
+  ARRAY['GMP', 'WHO-GMP', 'ISO 9001', 'ICH Q7 Compliant'],
+  true
+) on conflict (id) do nothing;
+
+-- Supplier 6: StuttgartOnco GmbH
+insert into public.suppliers (id, user_id, company_name, country, description, address, website, founded_year, export_markets, certifications, verified)
+values (
+  'a1000000-0000-0000-0000-000000000006',
+  '00000000-0000-0000-0000-000000000000',
+  'StuttgartOnco GmbH',
+  'Germany',
+  'Dedicated oncology pharmaceutical manufacturer. Producing chemotherapy agents and supportive care medications under the strictest quality standards.',
+  'Onkologiestr. 8, 70173 Stuttgart, Germany',
+  'https://example.com/stuttgartonco',
+  2010,
+  ARRAY['Nigeria', 'South Africa', 'Kenya'],
+  ARRAY['EU GMP', 'WHO-GMP', 'ISO 9001'],
+  false
+) on conflict (id) do nothing;
+
+-- Products for BerlinPharma
+insert into public.products (supplier_id, name, description, hs_code, category, min_order_qty, unit, certifications) values
+('a1000000-0000-0000-0000-000000000001', 'Amoxicillin 500mg Capsules', 'Broad-spectrum antibiotic, 500mg capsules, 100-count bottles', '3004.10', 'Antibiotics', 10000, 'bottles', ARRAY['GMP', 'WHO-GMP']),
+('a1000000-0000-0000-0000-000000000001', 'Ciprofloxacin 250mg Tablets', 'Fluoroquinolone antibiotic tablets', '3004.10', 'Antibiotics', 5000, 'bottles', ARRAY['GMP', 'WHO-GMP']),
+('a1000000-0000-0000-0000-000000000001', 'Amlodipine 5mg Tablets', 'Calcium channel blocker for hypertension', '3004.90', 'Cardiovascular', 8000, 'packs', ARRAY['GMP', 'ISO 9001']),
+('a1000000-0000-0000-0000-000000000001', 'Metformin 500mg Tablets', 'Oral antidiabetic, immediate release', '3004.90', 'Cardiovascular', 10000, 'packs', ARRAY['GMP', 'EU GMP']);
+
+-- Products for MunichMed
+insert into public.products (supplier_id, name, description, hs_code, category, min_order_qty, unit, certifications) values
+('a1000000-0000-0000-0000-000000000002', 'Ibuprofen 400mg Tablets', 'NSAID anti-inflammatory tablets', '3004.90', 'Anti-inflammatories', 20000, 'packs', ARRAY['GMP', 'CE Mark']),
+('a1000000-0000-0000-0000-000000000002', 'Paracetamol 500mg Tablets', 'Analgesic and antipyretic', '3004.90', 'Analgesics', 50000, 'packs', ARRAY['GMP', 'ISO 9001']),
+('a1000000-0000-0000-0000-000000000002', 'Diclofenac 50mg Tablets', 'NSAID for pain and inflammation', '3004.90', 'Anti-inflammatories', 15000, 'packs', ARRAY['GMP', 'CE Mark']);
+
+-- Products for HamburgBio
+insert into public.products (supplier_id, name, description, hs_code, category, min_order_qty, unit, certifications) values
+('a1000000-0000-0000-0000-000000000003', 'Hepatitis B Vaccine', 'Recombinant hepatitis B vaccine, single-dose vials', '3002.12', 'Vaccines', 1000, 'vials', ARRAY['WHO-GMP', 'PEI Approved']),
+('a1000000-0000-0000-0000-000000000003', 'Tetanus Toxoid Vaccine', 'Tetanus toxoid for immunization programs', '3002.12', 'Vaccines', 2000, 'vials', ARRAY['WHO-GMP', 'PEI Approved']),
+('a1000000-0000-0000-0000-000000000003', 'Erythropoietin Injection', 'Recombinant EPO for anemia treatment', '3002.13', 'Biologics', 500, 'pre-filled syringes', ARRAY['EU GMP', 'ISO 9001']);
+
+-- Products for RheinDiagnostik
+insert into public.products (supplier_id, name, description, hs_code, category, min_order_qty, unit, certifications) values
+('a1000000-0000-0000-0000-000000000004', 'Rapid Malaria Test Kit', 'Immunochromatographic rapid diagnostic test', '3006.30', 'Diagnostics', 5000, 'kits', ARRAY['CE Mark', 'ISO 13485']),
+('a1000000-0000-0000-0000-000000000004', 'Blood Glucose Test Strips', 'Electrochemical glucose test strips, 50-count', '3006.30', 'Diagnostics', 10000, 'boxes', ARRAY['CE Mark', 'ISO 13485']),
+('a1000000-0000-0000-0000-000000000004', 'Digital Blood Pressure Monitor', 'Automatic upper arm BP monitor', '9018.19', 'Medical Devices', 1000, 'units', ARRAY['CE Mark', 'ISO 13485']);
+
+-- Products for FrankfurtAPI
+insert into public.products (supplier_id, name, description, hs_code, category, min_order_qty, unit, certifications) values
+('a1000000-0000-0000-0000-000000000005', 'Amoxicillin Trihydrate API', 'Bulk API for tablet/capsule formulation', '2941.10', 'APIs', 500, 'kg', ARRAY['GMP', 'WHO-GMP', 'ICH Q7 Compliant']),
+('a1000000-0000-0000-0000-000000000005', 'Metformin HCl API', 'Bulk active ingredient for antidiabetic formulations', '2942.00', 'APIs', 1000, 'kg', ARRAY['GMP', 'ICH Q7 Compliant']),
+('a1000000-0000-0000-0000-000000000005', 'Paracetamol DC Grade', 'Direct compression grade paracetamol powder', '2924.29', 'APIs', 2000, 'kg', ARRAY['GMP', 'ISO 9001']);
+
+-- Products for StuttgartOnco
+insert into public.products (supplier_id, name, description, hs_code, category, min_order_qty, unit, certifications) values
+('a1000000-0000-0000-0000-000000000006', 'Cisplatin Injection 50mg', 'Platinum-based chemotherapy agent', '3004.90', 'Oncology', 200, 'vials', ARRAY['EU GMP', 'WHO-GMP']),
+('a1000000-0000-0000-0000-000000000006', 'Ondansetron 8mg Tablets', 'Anti-emetic for chemotherapy-induced nausea', '3004.90', 'Oncology', 5000, 'packs', ARRAY['EU GMP', 'ISO 9001']);
