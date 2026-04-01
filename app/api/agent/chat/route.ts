@@ -1,6 +1,13 @@
 import { convertToModelMessages, streamText, type UIMessage } from 'ai'
 import { getModel } from '@/app/lib/ai'
 import { PHARMAGENT_SYSTEM_PROMPT } from '@/app/lib/pharmagent-system-prompt'
+import {
+    knowledgeBaseTool,
+    webSearchTool,
+    webFetchTool,
+    supplierSearchTool,
+    productLookupTool,
+} from '@/app/lib/tools'
 
 // Simple in-memory rate limiter
 const rateLimiter = new Map<string, { count: number; resetAt: number }>()
@@ -24,7 +31,7 @@ function checkRateLimit(key: string): boolean {
     return true
 }
 
-export const maxDuration = 60
+export const maxDuration = 120
 
 export async function POST(request: Request): Promise<Response> {
     const ip = request.headers.get('x-forwarded-for') ?? 'anonymous'
@@ -48,6 +55,14 @@ export async function POST(request: Request): Promise<Response> {
         model: getModel(),
         system: PHARMAGENT_SYSTEM_PROMPT,
         messages: await convertToModelMessages(messages),
+        tools: {
+            searchKnowledgeBase: knowledgeBaseTool,
+            searchWeb: webSearchTool,
+            fetchWebPage: webFetchTool,
+            searchSuppliers: supplierSearchTool,
+            lookupProducts: productLookupTool,
+        },
+        maxSteps: 5,
     })
 
     return result.toUIMessageStreamResponse()
