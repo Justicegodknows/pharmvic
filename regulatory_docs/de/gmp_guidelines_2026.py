@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-  <html lang="en" dir="ltr" prefix="og: https://ogp.me/ns#">
-    <head>
-      <meta charset="utf-8" />
+<html lang="en" dir="ltr" prefix="og: https://ogp.me/ns#">
+  <head>
+    <meta charset="utf-8" />
 <noscript><style>form.antibot * :not(.antibot-message) { display: none !important; }</style>
 </noscript><meta name="description" content="We are sorry, but the content you tried to access is unavailable at the link you used, which was either incorrect or out-of-date. To help you find what you are looking for, we have included some useful tips." />
 <link rel="canonical" href="https://www.ema.europa.eu/en/error-404" />
@@ -21,7 +21,7 @@
 <meta name="twitter:image" content="https://www.ema.europa.eu/sites/default/files/styles/ema_smp_twitter/public/2024-06/Document_magnify-glass_cog_0.svg.webp?itok=fH2w_yXb" />
 <meta name="twitter:image:alt" content="icon document cog magnifying glass" />
 <noscript><style type="text/css" name="oe-back-top-no-script">
-    @charset "utf-8";
+@charset "utf-8";
     .back-to-top { display: block !important; }
     .back-to-top .link { margin-bottom: 2rem; opacity: 1; }
   </style></noscript>
