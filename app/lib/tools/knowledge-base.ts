@@ -10,7 +10,7 @@ import { generateEmbedding } from '@/app/lib/embeddings'
  */
 export const knowledgeBaseTool = tool({
     description: 'Search the PharmConnect knowledge base for regulatory information, NAFDAC guidelines, German export regulations, customs procedures, HS codes, and pharmaceutical import/export documentation. Use this tool whenever the user asks about regulations, certifications, required documents, or import/export procedures.',
-    parameters: z.object({
+    inputSchema: z.object({
         query: z.string().describe('The search query — describe what information you need'),
         sourceFilter: z.enum(['regulatory', 'platform', 'web', 'upload']).optional()
             .describe('Optional filter to narrow results by source type'),

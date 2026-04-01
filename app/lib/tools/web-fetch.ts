@@ -10,7 +10,7 @@ const MAX_CONTENT_LENGTH = 8000
  */
 export const webFetchTool = tool({
     description: 'Fetch and read the content of a specific web page URL. Use this to read regulatory documents, NAFDAC pages, German authority websites, supplier pages, or any URL referenced in search results or by the user.',
-    parameters: z.object({
+    inputSchema: z.object({
         url: z.string().url().describe('The URL of the web page to fetch and read'),
     }),
     execute: async ({ url }) => {

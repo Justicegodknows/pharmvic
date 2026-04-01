@@ -1,7 +1,8 @@
 'use client'
 
 import { useChat } from '@ai-sdk/react'
-import { DefaultChatTransport } from 'ai'
+import { DefaultChatTransport, isToolUIPart, getToolName } from 'ai'
+import type { ToolUIPart, DynamicToolUIPart } from 'ai'
 import {
     Conversation,
     ConversationContent,
@@ -13,6 +14,13 @@ import {
     MessageContent,
 } from '@/components/ai-elements/message'
 import {
+    Tool,
+    ToolHeader,
+    ToolContent,
+    ToolInput,
+    ToolOutput,
+} from '@/components/ai-elements/tool'
+import {
     Suggestions,
     Suggestion,
 } from '@/components/ai-elements/suggestion'
@@ -20,6 +28,14 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { MessageSquareIcon, SendIcon } from 'lucide-react'
 import { useState, useRef, type FormEvent, type ReactElement, type KeyboardEvent } from 'react'
+
+const TOOL_LABELS: Record<string, string> = {
+    searchKnowledgeBase: 'Searching knowledge base',
+    searchWeb: 'Searching the web',
+    fetchWebPage: 'Reading web page',
+    searchSuppliers: 'Searching suppliers',
+    lookupProducts: 'Looking up products',
+}
 
 const SUGGESTED_QUESTIONS = [
     'What documents do I need to import drugs from Germany?',
@@ -32,6 +48,37 @@ const SUGGESTED_QUESTIONS = [
 const transport = new DefaultChatTransport({
     api: '/api/agent/chat',
 })
+
+function ToolPartRenderer({ part }: { part: ToolUIPart | DynamicToolUIPart }): ReactElement {
+    const toolName = getToolName(part)
+    const label = TOOL_LABELS[toolName] ?? toolName
+
+    return (
+        <Tool defaultOpen={false}>
+            <ToolHeader
+                title={label}
+                type={part.type as 'dynamic-tool'}
+                state={part.state}
+                toolName={toolName}
+            />
+            <ToolContent>
+                <ToolInput input={part.input} />
+                {part.state === 'output-available' && (
+                    <ToolOutput
+                        output={part.output}
+                        errorText={undefined}
+                    />
+                )}
+                {part.state === 'output-error' && (
+                    <ToolOutput
+                        output={undefined}
+                        errorText={part.errorText}
+                    />
+                )}
+            </ToolContent>
+        </Tool>
+    )
+}
 
 export default function AgentChatPage(): ReactElement {
     const { messages, sendMessage, status } = useChat({ transport })
@@ -66,7 +113,7 @@ export default function AgentChatPage(): ReactElement {
                     PharmAgent
                 </h1>
                 <p className="text-sm text-muted-foreground">
-                    Your AI assistant for pharmaceutical import guidance
+                    Your AI assistant for pharmaceutical import guidance — powered by RAG and web search
                 </p>
             </div>
 
@@ -75,18 +122,24 @@ export default function AgentChatPage(): ReactElement {
                     {messages.length === 0 ? (
                         <ConversationEmptyState
                             title="Welcome to PharmAgent"
-                            description="Ask me anything about importing pharmaceuticals from Germany to Nigeria — NAFDAC registration, customs procedures, required documents, and more."
+                            description="Ask me anything about importing pharmaceuticals from Germany to Nigeria — NAFDAC registration, customs procedures, required documents, and more. I can search our knowledge base, look up suppliers, and browse the web for the latest information."
                             icon={<MessageSquareIcon className="h-10 w-10" />}
                         />
                     ) : (
                         messages.map((message) => (
                             <Message key={message.id} from={message.role}>
                                 <MessageContent>
-                                    {message.parts.map((part, index) =>
-                                        part.type === 'text' ? (
-                                            <div key={index} className="whitespace-pre-wrap">{part.text}</div>
-                                        ) : null
-                                    )}
+                                    {message.parts.map((part, index) => {
+                                        if (part.type === 'text') {
+                                            return (
+                                                <div key={index} className="whitespace-pre-wrap">{part.text}</div>
+                                            )
+                                        }
+                                        if (isToolUIPart(part)) {
+                                            return <ToolPartRenderer key={index} part={part} />
+                                        }
+                                        return null
+                                    })}
                                 </MessageContent>
                             </Message>
                         ))

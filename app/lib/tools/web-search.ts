@@ -7,7 +7,7 @@ import { z } from 'zod'
  */
 export const webSearchTool = tool({
     description: 'Search the web for current information about pharmaceutical regulations, NAFDAC updates, German export rules, drug pricing, HS codes, or any topic the user asks about. Use this when the knowledge base does not have enough information or the user needs the latest data.',
-    parameters: z.object({
+    inputSchema: z.object({
         query: z.string().describe('The search query to look up on the web'),
         maxResults: z.number().min(1).max(10).optional()
             .describe('Maximum number of search results to return (default 5)'),

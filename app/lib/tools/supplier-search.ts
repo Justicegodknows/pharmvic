@@ -8,7 +8,7 @@ import { createAdminClient } from '@/lib/supabase/admin'
  */
 export const supplierSearchTool = tool({
     description: 'Search the PharmConnect marketplace for German pharmaceutical suppliers. Use this when the user asks about finding suppliers, manufacturers, or specific pharmaceutical products. Returns supplier profiles with certifications and product listings.',
-    parameters: z.object({
+    inputSchema: z.object({
         query: z.string().optional()
             .describe('Search term for supplier name, description, or product'),
         category: z.string().optional()
@@ -108,7 +108,7 @@ export const supplierSearchTool = tool({
  */
 export const productLookupTool = tool({
     description: 'Look up specific pharmaceutical products available on PharmConnect by name, category, or HS code. Use this when the user asks about specific drugs, active pharmaceutical ingredients, or wants to find products by HS/tariff code.',
-    parameters: z.object({
+    inputSchema: z.object({
         name: z.string().optional().describe('Product name to search for'),
         category: z.string().optional().describe('Product category'),
         hsCode: z.string().optional().describe('HS code / tariff code to look up'),

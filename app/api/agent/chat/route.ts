@@ -1,4 +1,4 @@
-import { convertToModelMessages, streamText, type UIMessage } from 'ai'
+import { convertToModelMessages, streamText, stepCountIs, type UIMessage } from 'ai'
 import { getModel } from '@/app/lib/ai'
 import { PHARMAGENT_SYSTEM_PROMPT } from '@/app/lib/pharmagent-system-prompt'
 import {
@@ -62,7 +62,7 @@ export async function POST(request: Request): Promise<Response> {
             searchSuppliers: supplierSearchTool,
             lookupProducts: productLookupTool,
         },
-        maxSteps: 5,
+        stopWhen: stepCountIs(5),
     })
 
     return result.toUIMessageStreamResponse()
