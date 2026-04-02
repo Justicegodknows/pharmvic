@@ -194,7 +194,7 @@ export default function RegulatoryGuidePage(): ReactElement {
                     <ul className="space-y-2">
                         {REQUIRED_DOCS.map((doc) => (
                             <li key={doc} className="flex items-center gap-2 text-sm text-muted-foreground">
-                                <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-primary" />
+                                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
                                 {doc}
                             </li>
                         ))}
@@ -263,7 +263,7 @@ export default function RegulatoryGuidePage(): ReactElement {
                             <Card className="overflow-hidden">
                                 <CollapsibleTrigger className="flex w-full items-center justify-between p-4 text-left text-sm font-medium text-foreground hover:bg-muted/50">
                                     {item.question}
-                                    <ChevronDownIcon className="h-4 w-4 flex-shrink-0 text-muted-foreground transition-transform [[data-state=open]>&]:rotate-180" />
+                                    <ChevronDownIcon className="h-4 w-4 shrink-0 text-muted-foreground transition-transform [[data-state=open]>&]:rotate-180" />
                                 </CollapsibleTrigger>
                                 <CollapsibleContent>
                                     <div className="border-t px-4 py-3">

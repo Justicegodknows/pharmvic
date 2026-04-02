@@ -37,6 +37,22 @@ const TOOL_LABELS: Record<string, string> = {
     lookupProducts: 'Looking up products',
 }
 
+// Stitch MCP tools are dynamically provided — map common prefixes/patterns
+// to friendly labels. Falls back to a humanised version of the tool name.
+function getToolLabel(toolName: string): string {
+    if (TOOL_LABELS[toolName]) return TOOL_LABELS[toolName]
+    // Common Stitch tool patterns
+    if (toolName.includes('screen')) return 'Fetching design screens'
+    if (toolName.includes('snapshot')) return 'Creating UI snapshot'
+    if (toolName.includes('design') || toolName.includes('stitch')) return 'Working with design'
+    if (toolName.includes('generate') || toolName.includes('code')) return 'Generating code'
+    // Fallback: convert snake_case/camelCase to readable text
+    return toolName
+        .replace(/([a-z])([A-Z])/g, '$1 $2')
+        .replace(/[_-]/g, ' ')
+        .replace(/^\w/, (c) => c.toUpperCase())
+}
+
 const SUGGESTED_QUESTIONS = [
     'What documents do I need to import drugs from Germany?',
     'How do I register a product with NAFDAC?',
@@ -49,9 +65,29 @@ const transport = new DefaultChatTransport({
     api: '/api/agent/chat',
 })
 
+function isHtmlOutput(output: unknown): output is string {
+    return typeof output === 'string' && /^\s*<!DOCTYPE|^\s*<html/i.test(output)
+}
+
+function DesignPreview({ html }: { html: string }): ReactElement {
+    return (
+        <div className="space-y-2">
+            <h4 className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+                Design Preview
+            </h4>
+            <iframe
+                srcDoc={html}
+                sandbox="allow-scripts"
+                className="h-100 w-full rounded-md border bg-white"
+                title="Stitch design preview"
+            />
+        </div>
+    )
+}
+
 function ToolPartRenderer({ part }: { part: ToolUIPart | DynamicToolUIPart }): ReactElement {
     const toolName = getToolName(part)
-    const label = TOOL_LABELS[toolName] ?? toolName
+    const label = getToolLabel(toolName)
 
     return (
         <Tool defaultOpen={false}>
@@ -63,7 +99,10 @@ function ToolPartRenderer({ part }: { part: ToolUIPart | DynamicToolUIPart }): R
             />
             <ToolContent>
                 <ToolInput input={part.input} />
-                {part.state === 'output-available' && (
+                {part.state === 'output-available' && isHtmlOutput(part.output) && (
+                    <DesignPreview html={part.output} />
+                )}
+                {part.state === 'output-available' && !isHtmlOutput(part.output) && (
                     <ToolOutput
                         output={part.output}
                         errorText={undefined}

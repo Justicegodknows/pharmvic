@@ -8,7 +8,9 @@
     "start": "next start",
     "lint": "eslint",
     "test": "playwright test",
-    "test:ui": "playwright test --ui"
+    "test:ui": "playwright test --ui",
+    "crawl:nafdac": "tsx app/lib/crawl-nafdac.ts",
+    "crawl:customs": "tsx app/lib/crawl-customs.ts"
   },
   "dependencies": {
     "@ai-sdk/mcp": "^1.0.30",
@@ -16,6 +18,7 @@
     "@ai-sdk/react": "^3.0.143",
     "@hugeicons/core-free-icons": "^4.1.1",
     "@hugeicons/react": "^1.1.6",
+    "@mendable/firecrawl-js": "^4.18.1",
     "@modelcontextprotocol/sdk": "^1.29.0",
     "@radix-ui/react-use-controllable-state": "^1.2.2",
     "@rive-app/react-webgl2": "^4.27.3",

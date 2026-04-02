@@ -10,11 +10,13 @@ import {
     MessageSquareIcon,
     PackageIcon,
     UsersIcon,
+    BrainCircuitIcon,
 } from 'lucide-react'
 import type { ReactElement, ReactNode } from 'react'
 
 const VENDOR_NAV = [
     { href: '/dashboard', label: 'Overview', icon: LayoutDashboardIcon },
+    { href: '/dashboard/intelligence', label: 'Market Intel', icon: BrainCircuitIcon },
     { href: '/dashboard/inquiries', label: 'My Inquiries', icon: InboxIcon },
     { href: '/dashboard/documents', label: 'Documents', icon: FileTextIcon },
     { href: '/dashboard/checklist', label: 'Checklist', icon: ClipboardCheckIcon },
@@ -23,6 +25,7 @@ const VENDOR_NAV = [
 
 const SUPPLIER_NAV = [
     { href: '/dashboard', label: 'Overview', icon: LayoutDashboardIcon },
+    { href: '/dashboard/intelligence', label: 'Market Intel', icon: BrainCircuitIcon },
     { href: '/dashboard/inquiries', label: 'Inquiries', icon: InboxIcon },
     { href: '/dashboard/products', label: 'Products', icon: PackageIcon },
     { href: '/dashboard/profile', label: 'Company Profile', icon: UsersIcon },
@@ -51,7 +54,7 @@ export default async function DashboardLayout({
     return (
         <div className="flex min-h-[calc(100vh-4rem)]">
             {/* Sidebar */}
-            <aside className="hidden w-64 flex-shrink-0 border-r border-border bg-muted/30 p-4 md:block">
+            <aside className="hidden w-64 shrink-0 border-r border-border bg-muted/30 p-4 md:block">
                 <div className="mb-6">
                     <p className="text-sm font-semibold text-foreground">{profile?.company_name ?? 'Dashboard'}</p>
                     <p className="text-xs text-muted-foreground capitalize">{profile?.role ?? 'user'} account</p>

@@ -42,3 +42,20 @@ You have access to the following tools. Use them proactively to provide accurate
 - Always include this disclaimer when providing regulatory guidance: "This information is for general guidance only. Please consult a licensed pharmaceutical regulatory consultant or customs broker for advice specific to your situation."
 - Do not provide legal advice or act as a licensed customs broker.
 - You may reference PharmConnect platform features (marketplace search, supplier profiles, document vault) when relevant to the user's question.`;
+
+const STITCH_DESIGN_ADDENDUM = `
+
+## Design-to-Code Tools (Stitch)
+
+You also have access to Stitch design tools provided via MCP. These allow you to work with UI design screens from Google Stitch projects — listing screens, fetching screen designs, and generating production-ready code from them.
+
+When a user asks about design, UI screens, layout mockups, or wants to see available screens from a design project, use the Stitch tools. These tools are dynamically provided so their exact names may vary — look for tools related to screens, designs, snapshots, or code generation.
+
+When returning HTML or code from Stitch tools, present it clearly in a code block so it renders properly.`;
+
+export function buildSystemPrompt(options: { stitchEnabled: boolean }): string {
+    if (options.stitchEnabled) {
+        return PHARMAGENT_SYSTEM_PROMPT + STITCH_DESIGN_ADDENDUM
+    }
+    return PHARMAGENT_SYSTEM_PROMPT
+}

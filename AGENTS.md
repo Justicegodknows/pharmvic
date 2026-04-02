@@ -94,6 +94,14 @@ npm test
 
 # Run tests with interactive Playwright UI
 npm run test:ui
+
+# Crawl NAFDAC website and ingest into RAG knowledge base
+# Requires FIRECRAWL_API_KEY and RAG_ADMIN_API_KEY in .env.local
+npm run crawl:nafdac
+
+# Crawl Nigerian Customs website and ingest into RAG knowledge base
+# Requires FIRECRAWL_API_KEY and RAG_ADMIN_API_KEY in .env.local
+npm run crawl:customs
 ```
 
 ---

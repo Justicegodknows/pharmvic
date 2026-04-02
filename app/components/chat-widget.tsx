@@ -83,8 +83,8 @@ export function ChatWidget(): ReactElement {
                     >
                         <div
                             className={`max-w-[85%] rounded-lg px-3 py-2 text-sm ${msg.role === 'user'
-                                    ? 'bg-primary text-primary-foreground'
-                                    : 'bg-muted text-foreground'
+                                ? 'bg-primary text-primary-foreground'
+                                : 'bg-muted text-foreground'
                                 }`}
                         >
                             {msg.parts.map((part, i) =>
@@ -108,7 +108,7 @@ export function ChatWidget(): ReactElement {
                     rows={1}
                     disabled={isLoading}
                 />
-                <Button type="submit" size="icon" className="h-9 w-9 flex-shrink-0" disabled={isLoading || !input.trim()}>
+                <Button type="submit" size="icon" className="h-9 w-9 shrink-0" disabled={isLoading || !input.trim()}>
                     <SendIcon className="h-3.5 w-3.5" />
                 </Button>
             </form>

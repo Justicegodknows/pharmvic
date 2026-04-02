@@ -46,6 +46,22 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* Stitch Clinical Intelligence design tokens */
+  --color-ci-primary: #000F22;
+  --color-ci-primary-container: #0A2540;
+  --color-ci-secondary: #006A6A;
+  --color-ci-secondary-container: #79F6F5;
+  --color-ci-surface: #F7F9FB;
+  --color-ci-surface-low: #F2F4F6;
+  --color-ci-surface-high: #E6E8EA;
+  --color-ci-surface-white: #FFFFFF;
+  --color-ci-on-surface: #191C1E;
+  --color-ci-on-surface-variant: #43474D;
+  --color-ci-outline-variant: #C4C6CE;
+  --color-ci-on-secondary-container: #007070;
+  --color-ci-error: #BA1A1A;
+  --color-ci-error-container: #FFDAD6;
 }
 
 :root {

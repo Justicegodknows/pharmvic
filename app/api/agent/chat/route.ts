@@ -1,6 +1,6 @@
 import { convertToModelMessages, streamText, stepCountIs, type UIMessage, type Tool } from 'ai'
 import { getModel } from '@/app/lib/ai'
-import { PHARMAGENT_SYSTEM_PROMPT } from '@/app/lib/pharmagent-system-prompt'
+import { PHARMAGENT_SYSTEM_PROMPT, buildSystemPrompt } from '@/app/lib/pharmagent-system-prompt'
 import {
     knowledgeBaseTool,
     webSearchTool,
@@ -57,6 +57,7 @@ export async function POST(request: Request): Promise<Response> {
     // throughout the full streaming response.
     const stitchClient = await getStitchMCPClient()
     const stitchTools = stitchClient ? await stitchClient.tools() : {}
+    const stitchEnabled = Object.keys(stitchTools).length > 0
 
     const tools: Record<string, Tool> = {
         searchKnowledgeBase: knowledgeBaseTool,
@@ -69,7 +70,7 @@ export async function POST(request: Request): Promise<Response> {
 
     const result = streamText({
         model: getModel(),
-        system: PHARMAGENT_SYSTEM_PROMPT,
+        system: buildSystemPrompt({ stitchEnabled }),
         messages: await convertToModelMessages(messages),
         tools,
         stopWhen: stepCountIs(5),

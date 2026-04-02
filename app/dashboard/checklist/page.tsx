@@ -130,9 +130,9 @@ export default function ChecklistPage(): ReactElement {
                         onClick={() => toggle(item.id)}
                     >
                         {item.completed ? (
-                            <CheckCircle2Icon className="mt-0.5 h-5 w-5 flex-shrink-0 text-primary" />
+                            <CheckCircle2Icon className="mt-0.5 h-5 w-5 shrink-0 text-primary" />
                         ) : (
-                            <CircleIcon className="mt-0.5 h-5 w-5 flex-shrink-0 text-muted-foreground" />
+                            <CircleIcon className="mt-0.5 h-5 w-5 shrink-0 text-muted-foreground" />
                         )}
                         <div>
                             <p className={`text-sm font-medium ${item.completed ? 'text-muted-foreground line-through' : 'text-foreground'}`}>
