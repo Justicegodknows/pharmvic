@@ -1,7 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
-import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import {
     InboxIcon,
     FileTextIcon,
@@ -78,92 +76,92 @@ export default async function DashboardPage(): Promise<ReactElement> {
     return (
         <div>
             <div className="mb-8">
-                <h1 className="text-2xl font-bold text-foreground">
+                <h1 className="font-headline text-3xl font-extrabold text-[#000F22]">
                     Welcome, {profile?.full_name || 'User'}
                 </h1>
-                <p className="mt-1 text-muted-foreground">
+                <p className="mt-1 text-[#43474D]">
                     {profile?.company_name} &middot;{' '}
-                    <Badge variant="outline" className="capitalize">{profile?.role}</Badge>
+                    <span className="inline-block bg-[#79F6F5]/20 text-[#007070] text-xs font-bold px-2 py-0.5 rounded capitalize">{profile?.role}</span>
                 </p>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 <Link href="/dashboard/inquiries">
-                    <Card className="p-6 transition-colors hover:bg-muted/50">
-                        <div className="flex items-center gap-3">
-                            <InboxIcon className="h-5 w-5 text-primary" />
-                            <div>
-                                <p className="text-2xl font-bold text-foreground">{inquiryCount}</p>
-                                <p className="text-sm text-muted-foreground">Inquiries</p>
-                            </div>
+                    <div className="bg-white p-6 rounded-xl border border-[#C4C6CE]/15 transition-colors hover:bg-[#F2F4F6]">
+                        <div className="flex justify-between items-start mb-4">
+                            <span className="bg-[#79F6F5]/30 text-[#006A6A] p-2 rounded-lg">
+                                <InboxIcon className="h-5 w-5" />
+                            </span>
                         </div>
-                    </Card>
+                        <p className="text-[#43474D] text-sm font-medium">Inquiries</p>
+                        <h2 className="text-4xl font-headline font-bold text-[#000F22] mt-1">{inquiryCount}</h2>
+                    </div>
                 </Link>
 
                 {isVendor && (
                     <Link href="/dashboard/documents">
-                        <Card className="p-6 transition-colors hover:bg-muted/50">
-                            <div className="flex items-center gap-3">
-                                <FileTextIcon className="h-5 w-5 text-primary" />
-                                <div>
-                                    <p className="text-2xl font-bold text-foreground">{documentCount}</p>
-                                    <p className="text-sm text-muted-foreground">Documents</p>
-                                </div>
+                        <div className="bg-white p-6 rounded-xl border border-[#C4C6CE]/15 transition-colors hover:bg-[#F2F4F6]">
+                            <div className="flex justify-between items-start mb-4">
+                                <span className="bg-[#79F6F5]/30 text-[#006A6A] p-2 rounded-lg">
+                                    <FileTextIcon className="h-5 w-5" />
+                                </span>
                             </div>
-                        </Card>
+                            <p className="text-[#43474D] text-sm font-medium">Documents</p>
+                            <h2 className="text-4xl font-headline font-bold text-[#000F22] mt-1">{documentCount}</h2>
+                        </div>
                     </Link>
                 )}
 
                 {isSupplier && (
                     <Link href="/dashboard/products">
-                        <Card className="p-6 transition-colors hover:bg-muted/50">
-                            <div className="flex items-center gap-3">
-                                <PackageIcon className="h-5 w-5 text-primary" />
-                                <div>
-                                    <p className="text-2xl font-bold text-foreground">{productCount}</p>
-                                    <p className="text-sm text-muted-foreground">Products</p>
-                                </div>
+                        <div className="bg-white p-6 rounded-xl border border-[#C4C6CE]/15 transition-colors hover:bg-[#F2F4F6]">
+                            <div className="flex justify-between items-start mb-4">
+                                <span className="bg-[#79F6F5]/30 text-[#006A6A] p-2 rounded-lg">
+                                    <PackageIcon className="h-5 w-5" />
+                                </span>
                             </div>
-                        </Card>
+                            <p className="text-[#43474D] text-sm font-medium">Products</p>
+                            <h2 className="text-4xl font-headline font-bold text-[#000F22] mt-1">{productCount}</h2>
+                        </div>
                     </Link>
                 )}
 
                 {isVendor && (
                     <Link href="/dashboard/checklist">
-                        <Card className="p-6 transition-colors hover:bg-muted/50">
-                            <div className="flex items-center gap-3">
-                                <ClipboardCheckIcon className="h-5 w-5 text-primary" />
-                                <div>
-                                    <p className="text-2xl font-bold text-foreground">—</p>
-                                    <p className="text-sm text-muted-foreground">Reg. Checklist</p>
-                                </div>
+                        <div className="bg-white p-6 rounded-xl border border-[#C4C6CE]/15 transition-colors hover:bg-[#F2F4F6]">
+                            <div className="flex justify-between items-start mb-4">
+                                <span className="bg-[#FFDAD6]/30 text-[#BA1A1A] p-2 rounded-lg">
+                                    <ClipboardCheckIcon className="h-5 w-5" />
+                                </span>
                             </div>
-                        </Card>
+                            <p className="text-[#43474D] text-sm font-medium">Reg. Checklist</p>
+                            <h2 className="text-4xl font-headline font-bold text-[#000F22] mt-1">&mdash;</h2>
+                        </div>
                     </Link>
                 )}
             </div>
 
             {/* Quick actions */}
             <div className="mt-8">
-                <h2 className="mb-4 text-lg font-semibold text-foreground">Quick Actions</h2>
+                <h2 className="mb-4 font-headline text-lg font-bold text-[#000F22]">Quick Actions</h2>
                 <div className="flex flex-wrap gap-3">
                     {isVendor && (
                         <>
                             <Link
                                 href="/marketplace"
-                                className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+                                className="rounded-full border border-[#C4C6CE]/30 px-6 py-2 text-sm font-bold text-[#43474D] transition-colors hover:bg-[#F2F4F6]"
                             >
                                 Browse Suppliers
                             </Link>
                             <Link
                                 href="/regulatory-guide"
-                                className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+                                className="rounded-full border border-[#C4C6CE]/30 px-6 py-2 text-sm font-bold text-[#43474D] transition-colors hover:bg-[#F2F4F6]"
                             >
                                 Regulatory Guide
                             </Link>
                             <Link
                                 href="/agent-chat"
-                                className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+                                className="rounded-full bg-[#000F22] px-6 py-2 text-sm font-bold text-white hover:opacity-90 transition-all"
                             >
                                 Ask PharmAgent
                             </Link>
@@ -173,13 +171,13 @@ export default async function DashboardPage(): Promise<ReactElement> {
                         <>
                             <Link
                                 href="/dashboard/products"
-                                className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+                                className="rounded-full border border-[#C4C6CE]/30 px-6 py-2 text-sm font-bold text-[#43474D] transition-colors hover:bg-[#F2F4F6]"
                             >
                                 Manage Products
                             </Link>
                             <Link
                                 href="/dashboard/profile"
-                                className="rounded-lg border border-border px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted"
+                                className="rounded-full border border-[#C4C6CE]/30 px-6 py-2 text-sm font-bold text-[#43474D] transition-colors hover:bg-[#F2F4F6]"
                             >
                                 Edit Profile
                             </Link>

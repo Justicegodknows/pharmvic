@@ -9,7 +9,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  --font-heading: 'Manrope', var(--font-sans), sans-serif;
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -65,59 +65,59 @@
 }
 
 :root {
-  --background: oklch(0.99 0.002 120);
-  --foreground: oklch(0.17 0.04 150);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.17 0.04 150);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.17 0.04 150);
-  --primary: oklch(0.35 0.12 150);
-  --primary-foreground: oklch(0.99 0.01 120);
-  --secondary: oklch(0.95 0.02 120);
-  --secondary-foreground: oklch(0.25 0.08 150);
-  --muted: oklch(0.96 0.01 120);
-  --muted-foreground: oklch(0.5 0.03 150);
-  --accent: oklch(0.82 0.16 85);
-  --accent-foreground: oklch(0.2 0.06 85);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.90 0.02 150);
-  --input: oklch(0.90 0.02 150);
-  --ring: oklch(0.45 0.12 150);
-  --chart-1: oklch(0.35 0.12 150);
-  --chart-2: oklch(0.82 0.16 85);
-  --chart-3: oklch(0.5 0.10 150);
-  --chart-4: oklch(0.65 0.14 85);
-  --chart-5: oklch(0.25 0.08 150);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.20 0.06 150);
-  --sidebar-foreground: oklch(0.97 0.01 120);
-  --sidebar-primary: oklch(0.82 0.16 85);
-  --sidebar-primary-foreground: oklch(0.17 0.04 150);
-  --sidebar-accent: oklch(0.28 0.08 150);
-  --sidebar-accent-foreground: oklch(0.97 0.01 120);
-  --sidebar-border: oklch(0.30 0.06 150);
-  --sidebar-ring: oklch(0.45 0.12 150);
+  --background: #F7F9FB;
+  --foreground: #191C1E;
+  --card: #FFFFFF;
+  --card-foreground: #191C1E;
+  --popover: #FFFFFF;
+  --popover-foreground: #191C1E;
+  --primary: #000F22;
+  --primary-foreground: #FFFFFF;
+  --secondary: #006A6A;
+  --secondary-foreground: #FFFFFF;
+  --muted: #F2F4F6;
+  --muted-foreground: #43474D;
+  --accent: #79F6F5;
+  --accent-foreground: #007070;
+  --destructive: #BA1A1A;
+  --border: rgba(196, 198, 206, 0.15);
+  --input: #E6E8EA;
+  --ring: #006A6A;
+  --chart-1: #000F22;
+  --chart-2: #006A6A;
+  --chart-3: #0A2540;
+  --chart-4: #79F6F5;
+  --chart-5: #43474D;
+  --radius: 0.75rem;
+  --sidebar: #000F22;
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-primary: #79F6F5;
+  --sidebar-primary-foreground: #000F22;
+  --sidebar-accent: #0A2540;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: rgba(196, 198, 206, 0.15);
+  --sidebar-ring: #006A6A;
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
+  --background: #0A1628;
+  --foreground: #E0E3E5;
+  --card: #142538;
+  --card-foreground: #E0E3E5;
+  --popover: #142538;
+  --popover-foreground: #E0E3E5;
+  --primary: #B0C8EB;
+  --primary-foreground: #000F22;
+  --secondary: #79F6F5;
+  --secondary-foreground: #002020;
+  --muted: #1E2A3A;
+  --muted-foreground: #C4C6CE;
+  --accent: #006A6A;
+  --accent-foreground: #79F6F5;
+  --destructive: #FFDAD6;
+  --border: rgba(196, 198, 206, 0.1);
+  --input: rgba(255, 255, 255, 0.15);
+  --ring: #79F6F5;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -144,5 +144,29 @@
 
   html {
     @apply font-sans;
+  }
+}
+
+@layer utilities {
+  .glass-nav {
+    background: rgba(247, 249, 251, 0.7);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+  }
+
+  .font-headline {
+    font-family: 'Manrope', var(--font-sans), sans-serif;
+  }
+
+  .surface-low {
+    background-color: #F2F4F6;
+  }
+
+  .surface-high {
+    background-color: #E6E8EA;
+  }
+
+  .gradient-primary {
+    background: linear-gradient(135deg, #000F22, #0A2540);
   }
 }

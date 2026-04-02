@@ -1,220 +1,236 @@
 import Link from 'next/link'
-import { Button } from '@/components/ui/button'
-import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
 import {
-  SearchIcon,
-  UserPlusIcon,
-  MessageSquareIcon,
+  TruckIcon,
+  WalletIcon,
+  BrainCircuitIcon,
+  ShieldAlertIcon,
   ShieldCheckIcon,
-  GlobeIcon,
-  PackageIcon,
   BuildingIcon,
+  FlaskConicalIcon,
+  HeartPulseIcon,
+  TrendingUpIcon,
 } from 'lucide-react'
 import type { ReactElement } from 'react'
 
-const STATS = [
-  { label: 'Verified Suppliers', value: '50+', icon: BuildingIcon },
-  { label: 'Registered Vendors', value: '200+', icon: UserPlusIcon },
-  { label: 'Product Categories', value: '30+', icon: PackageIcon },
-  { label: 'Countries', value: '2', icon: GlobeIcon },
-]
-
-const STEPS = [
+const METRICS = [
   {
-    step: '01',
-    title: 'Register',
-    description: 'Create your free account as a Nigerian vendor or German supplier. Complete your profile with company details.',
+    label: 'Active Shipments',
+    value: '142',
+    change: '+12% vs LW',
+    icon: TruckIcon,
+    iconBg: 'bg-[#79F6F5]/30',
+    iconColor: 'text-[#006A6A]',
   },
   {
-    step: '02',
-    title: 'Search & Discover',
-    description: 'Browse GMP-certified German manufacturers. Filter by product category, certifications, and export capabilities.',
-  },
-  {
-    step: '03',
-    title: 'Connect & Trade',
-    description: 'Send inquiries, request quotes, and initiate verified trade relationships. PharmAgent guides you through compliance.',
+    label: 'Pending Credits',
+    value: '$1.2M',
+    note: '4 Invoices overdue > 30 days',
+    icon: WalletIcon,
+    iconBg: 'bg-[#FFDAD6]/30',
+    iconColor: 'text-[#BA1A1A]',
   },
 ]
 
-const FEATURED_SUPPLIERS = [
+const ALERTS = [
   {
-    name: 'BerlinPharma GmbH',
-    products: 'Antibiotics, Cardiovascular',
-    certifications: ['GMP', 'WHO-GMP', 'ISO 9001'],
+    title: 'NAFDAC Certificate Expiring',
+    description: 'Batch #902 (Amoxicillin) requires re-certification for Nigerian retail sale by Friday.',
+    borderColor: 'border-l-[#BA1A1A]',
+    icon: ShieldAlertIcon,
+    iconColor: 'text-[#BA1A1A]',
   },
   {
-    name: 'MunichMed AG',
-    products: 'Analgesics, Anti-inflammatories',
-    certifications: ['GMP', 'CE Mark', 'ISO 9001'],
+    title: 'Supply Chain Audit Complete',
+    description: 'Partner "PharmaRoute Abuja" has cleared the annual German-Nigeria corridor safety audit.',
+    borderColor: 'border-l-[#006A6A]',
+    icon: ShieldCheckIcon,
+    iconColor: 'text-[#006A6A]',
   },
   {
-    name: 'HamburgBio GmbH',
-    products: 'Biologics, Vaccines',
-    certifications: ['WHO-GMP', 'EU GMP', 'PEI Approved'],
+    title: 'Logistics: Port Delay',
+    description: 'Apapa Port experiencing 48h congestion. Re-routing recommended via Onne.',
+    borderColor: 'border-l-[#000F22]',
+    icon: TruckIcon,
+    iconColor: 'text-[#000F22]',
+  },
+]
+
+const PARTNERS = [
+  {
+    name: 'Lagos Med-Supply Ltd',
+    type: 'Distributor • Southern Region',
+    value: '$420k',
+    status: 'On-Track',
+    statusColor: 'text-[#006A6A]',
+    icon: BuildingIcon,
+  },
+  {
+    name: 'Kano Clinical Services',
+    type: 'Health System • Northern Region',
+    value: '$215k',
+    status: 'Payment Alert',
+    statusColor: 'text-[#BA1A1A]',
+    icon: HeartPulseIcon,
+  },
+  {
+    name: 'Rivers Biotech Partners',
+    type: 'Specialized Research • Port Harcourt',
+    value: '$890k',
+    status: 'Active Contract',
+    statusColor: 'text-[#006A6A]',
+    icon: FlaskConicalIcon,
   },
 ]
 
 export default function HomePage(): ReactElement {
   return (
-    <div className="flex flex-col">
-      {/* Hero */}
-      <section className="relative overflow-hidden bg-linear-to-br from-primary/5 via-background to-accent/10 py-20 sm:py-28 lg:py-36">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="mx-auto max-w-3xl text-center">
-            <Badge variant="secondary" className="mb-4">
-              Nigeria 🇳🇬 ↔ Germany 🇩🇪
-            </Badge>
-            <h1 className="text-4xl font-bold tracking-tight text-foreground sm:text-5xl lg:text-6xl">
-              Connecting Nigerian Pharma Vendors with{' '}
-              <span className="text-primary">German Manufacturers</span>
-            </h1>
-            <p className="mt-6 text-lg leading-8 text-muted-foreground">
-              Discover verified German pharmaceutical suppliers, understand NAFDAC requirements,
-              and initiate trusted B2B trade relationships — all in one platform.
-            </p>
-            <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-              <Button size="lg" asChild>
-                <Link href="/marketplace">
-                  <SearchIcon className="mr-2 h-4 w-4" />
-                  Find a Supplier
-                </Link>
-              </Button>
-              <Button size="lg" variant="outline" asChild>
-                <Link href="/auth/register">
-                  <UserPlusIcon className="mr-2 h-4 w-4" />
-                  Register as Vendor
-                </Link>
-              </Button>
-              <Button size="lg" variant="secondary" asChild>
-                <Link href="/agent-chat">
-                  <MessageSquareIcon className="mr-2 h-4 w-4" />
-                  Talk to PharmAgent
-                </Link>
-              </Button>
+    <div className="max-w-screen-2xl mx-auto px-6 pt-8 pb-24">
+      {/* Hero Strategy Section */}
+      <section className="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-12">
+        <div className="lg:col-span-8 flex flex-col justify-center">
+          <h1 className="font-headline text-5xl md:text-6xl font-extrabold text-[#000F22] tracking-tight mb-4">
+            Market Intelligence <br /><span className="text-[#006A6A]">Nigeria Hub</span>
+          </h1>
+          <p className="text-[#43474D] text-lg max-w-xl mb-8">
+            Aggregated real-time insights across the Nigerian-German corridor.
+            Monitoring pharmaceutical demand trends and supply chain integrity.
+          </p>
+          <div className="flex flex-wrap gap-4">
+            <Link
+              href="/marketplace"
+              className="bg-[#000F22] text-white px-8 py-3 rounded-full font-bold flex items-center gap-2 hover:opacity-90 transition-all shadow-lg"
+            >
+              Execute Trade Strategy <TrendingUpIcon className="h-4 w-4" />
+            </Link>
+            <Link
+              href="/regulatory-guide"
+              className="border border-[#C4C6CE]/30 px-8 py-3 rounded-full font-bold text-[#43474D] hover:bg-[#F2F4F6] transition-colors"
+            >
+              Download Report
+            </Link>
+          </div>
+        </div>
+
+        {/* Regional Alert Card */}
+        <div className="lg:col-span-4 gradient-primary rounded-xl overflow-hidden relative min-h-[300px]">
+          <div className="absolute inset-0 bg-linear-to-br from-[#000F22] to-[#0A2540]" />
+          <div className="relative p-8 h-full flex flex-col justify-between">
+            <div className="bg-[#79F6F5]/20 backdrop-blur-md p-4 rounded-lg">
+              <p className="text-[#79F6F5] text-xs font-bold uppercase tracking-widest mb-1">Regional Alert</p>
+              <h3 className="text-white font-headline text-xl font-bold">Lagos Logistics Center</h3>
+              <p className="text-[#C4C6CE] text-sm mt-2">Predicted demand surge: +24% for Anti-Malarials in Q3.</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <ShieldCheckIcon className="h-5 w-5 text-[#79F6F5]" />
+              <span className="text-white text-sm font-medium">Compliance: 100% Verified Path</span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Stats */}
-      <section className="border-y border-border bg-muted/30 py-12">
-        <div className="mx-auto grid max-w-7xl grid-cols-2 gap-8 px-4 sm:px-6 md:grid-cols-4 lg:px-8">
-          {STATS.map((stat) => (
-            <div key={stat.label} className="text-center">
-              <stat.icon className="mx-auto mb-2 h-6 w-6 text-primary" />
-              <div className="text-3xl font-bold text-foreground">{stat.value}</div>
-              <div className="text-sm text-muted-foreground">{stat.label}</div>
+      {/* Metrics Grid */}
+      <section className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mb-12">
+        {METRICS.map((metric) => (
+          <div key={metric.label} className="bg-white p-6 rounded-xl border border-[#C4C6CE]/15 flex flex-col justify-between">
+            <div>
+              <div className="flex justify-between items-start mb-4">
+                <span className={`${metric.iconBg} ${metric.iconColor} p-2 rounded-lg`}>
+                  <metric.icon className="h-5 w-5" />
+                </span>
+                {metric.change && (
+                  <span className="text-[#006A6A] text-xs font-bold">{metric.change}</span>
+                )}
+              </div>
+              <p className="text-[#43474D] text-sm font-medium">{metric.label}</p>
+              <h2 className="text-4xl font-headline font-bold text-[#000F22] mt-1">{metric.value}</h2>
+            </div>
+            {metric.note ? (
+              <p className="text-xs text-[#43474D] mt-6">{metric.note}</p>
+            ) : (
+              <div className="mt-6 h-1 w-full bg-[#ECEEF0] rounded-full overflow-hidden">
+                <div className="bg-[#006A6A] h-full w-3/4" />
+              </div>
+            )}
+          </div>
+        ))}
+
+        {/* AI Market Pulse — spanning 2 columns */}
+        <div className="md:col-span-2 bg-linear-to-br from-[#000F22] to-[#0A2540] p-6 rounded-xl text-white relative overflow-hidden">
+          <div className="relative z-10">
+            <div className="flex items-center gap-2 mb-4">
+              <BrainCircuitIcon className="h-5 w-5 text-[#79F6F5]" />
+              <span className="text-[#79F6F5] text-xs font-bold uppercase tracking-widest">AI Market Pulse</span>
+            </div>
+            <h3 className="text-2xl font-headline font-bold mb-2">High Demand: Kano State</h3>
+            <p className="text-[#C4C6CE] text-sm max-w-md">
+              Our neural network predicts a shortage of essential biologics in northern hubs within 14 days.
+              Recommend re-routing shipment #A293.
+            </p>
+            <Link href="/agent-chat" className="mt-6 inline-block text-sm font-bold text-[#79F6F5] hover:underline">
+              View Deep Analysis →
+            </Link>
+          </div>
+          <div className="absolute right-[-20px] top-[-20px] opacity-10">
+            <BrainCircuitIcon className="h-48 w-48" />
+          </div>
+        </div>
+      </section>
+
+      {/* Alerts and Partners (Bento Grid) */}
+      <section className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Compliance Alerts */}
+        <div className="lg:col-span-5 space-y-4">
+          <div className="flex justify-between items-center mb-2">
+            <h4 className="font-headline text-xl font-bold text-[#000F22]">Compliance Alerts</h4>
+            <span className="text-xs font-bold text-[#006A6A] bg-[#79F6F5]/20 px-2 py-1 rounded">
+              2 Critical
+            </span>
+          </div>
+          {ALERTS.map((alert) => (
+            <div
+              key={alert.title}
+              className={`bg-[#F2F4F6] p-4 rounded-xl flex gap-4 items-start border-l-4 ${alert.borderColor}`}
+            >
+              <alert.icon className={`h-5 w-5 mt-1 ${alert.iconColor}`} />
+              <div>
+                <p className="text-[#000F22] font-bold text-sm">{alert.title}</p>
+                <p className="text-[#43474D] text-xs mt-1">{alert.description}</p>
+              </div>
             </div>
           ))}
         </div>
-      </section>
 
-      {/* Featured Suppliers */}
-      <section className="py-16 sm:py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-foreground">Featured German Manufacturers</h2>
-            <p className="mt-2 text-muted-foreground">Verified pharmaceutical suppliers ready to export</p>
+        {/* Active Partnerships */}
+        <div className="lg:col-span-7 bg-white p-8 rounded-xl border border-[#C4C6CE]/15">
+          <div className="flex justify-between items-center mb-8">
+            <h4 className="font-headline text-xl font-bold text-[#000F22]">Active Partnerships</h4>
+            <Link href="/marketplace" className="text-[#006A6A] font-bold text-sm hover:opacity-70 transition-opacity">
+              Manage All
+            </Link>
           </div>
-          <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {FEATURED_SUPPLIERS.map((supplier) => (
-              <Card key={supplier.name} className="p-6">
-                <div className="flex items-start justify-between">
-                  <div>
-                    <h3 className="font-semibold text-foreground">{supplier.name}</h3>
-                    <p className="mt-1 text-sm text-muted-foreground">{supplier.products}</p>
+          <div className="space-y-6">
+            {PARTNERS.map((partner, i) => (
+              <div
+                key={partner.name}
+                className={`flex items-center justify-between ${i < PARTNERS.length - 1 ? 'pb-6 border-b border-[#C4C6CE]/10' : ''}`}
+              >
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 bg-[#E6E8EA] rounded-full flex items-center justify-center">
+                    <partner.icon className="h-5 w-5 text-[#000F22]" />
                   </div>
-                  <ShieldCheckIcon className="h-5 w-5 text-primary" />
+                  <div>
+                    <p className="text-[#000F22] font-bold">{partner.name}</p>
+                    <p className="text-[#43474D] text-xs">{partner.type}</p>
+                  </div>
                 </div>
-                <div className="mt-4 flex flex-wrap gap-2">
-                  {supplier.certifications.map((cert) => (
-                    <Badge key={cert} variant="outline" className="text-xs">
-                      {cert}
-                    </Badge>
-                  ))}
+                <div className="text-right">
+                  <p className="text-[#000F22] font-bold">{partner.value}</p>
+                  <p className={`${partner.statusColor} text-[10px] font-bold uppercase tracking-tight`}>
+                    {partner.status}
+                  </p>
                 </div>
-                <Button variant="outline" size="sm" className="mt-4 w-full" asChild>
-                  <Link href="/marketplace">View Profile</Link>
-                </Button>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* How It Works */}
-      <section className="bg-muted/30 py-16 sm:py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-foreground">How It Works</h2>
-            <p className="mt-2 text-muted-foreground">Three simple steps to start importing from Germany</p>
-          </div>
-          <div className="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3">
-            {STEPS.map((step) => (
-              <div key={step.step} className="relative rounded-xl bg-background p-6 shadow-sm">
-                <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-lg bg-primary text-sm font-bold text-primary-foreground">
-                  {step.step}
-                </div>
-                <h3 className="text-lg font-semibold text-foreground">{step.title}</h3>
-                <p className="mt-2 text-sm text-muted-foreground">{step.description}</p>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-16 sm:py-24">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-foreground">What Our Users Say</h2>
-          </div>
-          <div className="mt-10 grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {[
-              {
-                quote: 'PharmConnect simplified our entire import process. We found three new reliable German suppliers in our first week.',
-                name: 'Adebayo O.',
-                title: 'Procurement Manager, Lagos',
-              },
-              {
-                quote: 'The regulatory guide and PharmAgent saved us months of research on NAFDAC requirements.',
-                name: 'Chioma N.',
-                title: 'Director, PharmaBridge Nigeria',
-              },
-              {
-                quote: 'As a German exporter, PharmConnect opened the Nigerian market for us with verified, serious buyers.',
-                name: 'Klaus M.',
-                title: 'Export Director, Berlin',
-              },
-            ].map((t) => (
-              <Card key={t.name} className="p-6">
-                <p className="text-sm italic text-muted-foreground">&ldquo;{t.quote}&rdquo;</p>
-                <div className="mt-4">
-                  <p className="text-sm font-semibold text-foreground">{t.name}</p>
-                  <p className="text-xs text-muted-foreground">{t.title}</p>
-                </div>
-              </Card>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA */}
-      <section className="bg-primary py-16">
-        <div className="mx-auto max-w-3xl px-4 text-center sm:px-6 lg:px-8">
-          <h2 className="text-3xl font-bold text-primary-foreground">Ready to Start Trading?</h2>
-          <p className="mt-4 text-primary-foreground/80">
-            Join PharmConnect today and access verified German pharmaceutical manufacturers.
-          </p>
-          <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-            <Button size="lg" variant="secondary" asChild>
-              <Link href="/auth/register">Create Free Account</Link>
-            </Button>
-            <Button size="lg" variant="outline" className="border-primary-foreground/30 text-primary-foreground hover:bg-primary-foreground/10" asChild>
-              <Link href="/marketplace">Browse Suppliers</Link>
-            </Button>
           </div>
         </div>
       </section>

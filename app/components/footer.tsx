@@ -3,55 +3,50 @@ import type { ReactElement } from 'react'
 
 export function Footer(): ReactElement {
     return (
-        <footer className="border-t border-border bg-muted/30">
-            <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+        <footer className="bg-[#F2F4F6]">
+            <div className="mx-auto max-w-screen-2xl px-6 py-12">
                 <div className="grid grid-cols-1 gap-8 md:grid-cols-4">
                     {/* Brand */}
                     <div className="space-y-4">
-                        <div className="flex items-center gap-2">
-                            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
-                                <span className="text-sm font-bold text-primary-foreground">P</span>
-                            </div>
-                            <span className="text-lg font-bold">
-                                Pharm<span className="text-primary">Connect</span>
-                            </span>
-                        </div>
-                        <p className="text-sm text-muted-foreground">
+                        <span className="text-xl font-bold tracking-tight font-headline text-[#000F22]">
+                            PharmConnect
+                        </span>
+                        <p className="text-sm text-[#43474D]">
                             Connecting Nigerian pharmaceutical vendors with German manufacturers. Your trusted B2B pharma bridge.
                         </p>
                     </div>
 
                     {/* Platform */}
                     <div>
-                        <h3 className="mb-3 text-sm font-semibold">Platform</h3>
-                        <ul className="space-y-2 text-sm text-muted-foreground">
-                            <li><Link href="/marketplace" className="hover:text-foreground">Marketplace</Link></li>
-                            <li><Link href="/agent-chat" className="hover:text-foreground">PharmAgent AI</Link></li>
-                            <li><Link href="/auth/register" className="hover:text-foreground">Register</Link></li>
+                        <h3 className="mb-3 font-headline text-sm font-bold text-[#000F22]">Platform</h3>
+                        <ul className="space-y-2 text-sm text-[#43474D]">
+                            <li><Link href="/marketplace" className="hover:text-[#006A6A] transition-colors">Marketplace</Link></li>
+                            <li><Link href="/agent-chat" className="hover:text-[#006A6A] transition-colors">PharmAgent AI</Link></li>
+                            <li><Link href="/auth/register" className="hover:text-[#006A6A] transition-colors">Register</Link></li>
                         </ul>
                     </div>
 
                     {/* Resources */}
                     <div>
-                        <h3 className="mb-3 text-sm font-semibold">Resources</h3>
-                        <ul className="space-y-2 text-sm text-muted-foreground">
-                            <li><Link href="/regulatory-guide" className="hover:text-foreground">Regulatory Guide</Link></li>
-                            <li><a href="https://nafdac.gov.ng" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">NAFDAC</a></li>
-                            <li><a href="https://customs.gov.ng" target="_blank" rel="noopener noreferrer" className="hover:text-foreground">Nigerian Customs</a></li>
+                        <h3 className="mb-3 font-headline text-sm font-bold text-[#000F22]">Resources</h3>
+                        <ul className="space-y-2 text-sm text-[#43474D]">
+                            <li><Link href="/regulatory-guide" className="hover:text-[#006A6A] transition-colors">Regulatory Guide</Link></li>
+                            <li><a href="https://nafdac.gov.ng" target="_blank" rel="noopener noreferrer" className="hover:text-[#006A6A] transition-colors">NAFDAC</a></li>
+                            <li><a href="https://customs.gov.ng" target="_blank" rel="noopener noreferrer" className="hover:text-[#006A6A] transition-colors">Nigerian Customs</a></li>
                         </ul>
                     </div>
 
                     {/* Legal */}
                     <div>
-                        <h3 className="mb-3 text-sm font-semibold">Legal</h3>
-                        <ul className="space-y-2 text-sm text-muted-foreground">
+                        <h3 className="mb-3 font-headline text-sm font-bold text-[#000F22]">Legal</h3>
+                        <ul className="space-y-2 text-sm text-[#43474D]">
                             <li><span>Privacy Policy</span></li>
                             <li><span>Terms of Service</span></li>
                         </ul>
                     </div>
                 </div>
 
-                <div className="mt-8 border-t border-border pt-8 text-center text-xs text-muted-foreground">
+                <div className="mt-8 pt-8 border-t border-[#C4C6CE]/15 text-center text-xs text-[#43474D]">
                     <p>&copy; {new Date().getFullYear()} PharmConnect. All rights reserved.</p>
                     <p className="mt-1">
                         Informational platform only. Consult licensed professionals for regulatory advice.
