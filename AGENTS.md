@@ -88,9 +88,13 @@ npm install <package>
 
 # Install a new dev dependency
 npm install --save-dev <package>
-```
 
-**No test runner is configured yet.** Do not invent or assume a test command. When tests are added, update this file with the exact command.
+# Run smoke/E2E tests (requires dev server or uses webServer config)
+npm test
+
+# Run tests with interactive Playwright UI
+npm run test:ui
+```
 
 ---
 
@@ -257,7 +261,7 @@ The following were planned but have not been committed. Do not fabricate stubs, 
 - **Python layer** — no `requirements.txt`, `pyproject.toml`, or Python files exist. Do not create Python files without explicit instruction.
 - **Dockerfile / docker-compose** — no container config is committed. Do not add or reference one.
 - **GitHub Actions workflows** — no `.github/` directory exists. Do not reference CI commands.
-- **Test framework** — no Jest, Vitest, or Playwright config exists. Do not write `*.test.ts` or `*.spec.ts` files without a test runner being configured first.
+- **Test framework** — Playwright is configured. Tests live in `tests/`. Run with `npm test`. Config is in `playwright.config.ts`.
 
 When any of the above are added, **update this file immediately** with the relevant commands and conventions.
 
