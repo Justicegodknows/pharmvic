@@ -1,4 +1,4 @@
-import { convertToModelMessages, streamText, stepCountIs, type UIMessage } from 'ai'
+import { convertToModelMessages, streamText, stepCountIs, type UIMessage, type Tool } from 'ai'
 import { getModel } from '@/app/lib/ai'
 import { PHARMAGENT_SYSTEM_PROMPT } from '@/app/lib/pharmagent-system-prompt'
 import {
@@ -8,6 +8,7 @@ import {
     supplierSearchTool,
     productLookupTool,
 } from '@/app/lib/tools'
+import { getStitchMCPClient } from '@/app/lib/mcp'
 
 // Simple in-memory rate limiter
 const rateLimiter = new Map<string, { count: number; resetAt: number }>()
@@ -51,17 +52,26 @@ export async function POST(request: Request): Promise<Response> {
         )
     }
 
+    // Reuse the cached Stitch MCP client when STITCH_MCP_URL is configured.
+    // The client is kept alive for the process lifetime so it is available
+    // throughout the full streaming response.
+    const stitchClient = await getStitchMCPClient()
+    const stitchTools = stitchClient ? await stitchClient.tools() : {}
+
+    const tools: Record<string, Tool> = {
+        searchKnowledgeBase: knowledgeBaseTool,
+        searchWeb: webSearchTool,
+        fetchWebPage: webFetchTool,
+        searchSuppliers: supplierSearchTool,
+        lookupProducts: productLookupTool,
+        ...stitchTools,
+    }
+
     const result = streamText({
         model: getModel(),
         system: PHARMAGENT_SYSTEM_PROMPT,
         messages: await convertToModelMessages(messages),
-        tools: {
-            searchKnowledgeBase: knowledgeBaseTool,
-            searchWeb: webSearchTool,
-            fetchWebPage: webFetchTool,
-            searchSuppliers: supplierSearchTool,
-            lookupProducts: productLookupTool,
-        },
+        tools,
         stopWhen: stepCountIs(5),
     })
 

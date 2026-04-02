@@ -216,6 +216,40 @@ OPENAI_API_KEY=             # Required for AI features
 
 ---
 
+## Stitch MCP Server Integration
+
+The AI agent (`app/api/agent/chat/route.ts`) optionally connects to a [Google Stitch MCP server](https://github.com/davideast/stitch-mcp) for design-to-code tools. The connection is controlled entirely by environment variables — when `STITCH_MCP_URL` is unset the integration is silently disabled.
+
+### How it works
+
+- `app/lib/mcp.ts` exports `getStitchMCPClient()` which returns a module-level cached `@ai-sdk/mcp` client via HTTP transport.
+- The chat route calls `getStitchMCPClient()` which returns a cached client, fetches the tool list, and merges the Stitch tools with the built-in tools. The client is kept alive for the process lifetime so it remains available throughout the full streaming response.
+- Stitch tools are available to the AI agent alongside the existing `searchKnowledgeBase`, `searchWeb`, `fetchWebPage`, `searchSuppliers`, and `lookupProducts` tools.
+
+### Running the Stitch MCP server locally
+
+```bash
+# Authenticate once
+npx @_davideast/stitch-mcp init
+
+# Or set an API key instead of OAuth
+export STITCH_API_KEY="your-api-key"
+
+# Start the HTTP proxy (default port 3001)
+npx @_davideast/stitch-mcp proxy --http
+```
+
+Then add `STITCH_MCP_URL=http://localhost:3001` to your `.env.local`.
+
+### Packages added
+
+| Package | Version | Purpose |
+|---|---|---|
+| `@ai-sdk/mcp` | `^1.0.30` | MCP client for Vercel AI SDK |
+| `@modelcontextprotocol/sdk` | `^1.29.0` | MCP transport implementations |
+
+---
+
 ## What Does Not Exist Yet
 
 The following were planned but have not been committed. Do not fabricate stubs, configs, or references for them until they are added:
