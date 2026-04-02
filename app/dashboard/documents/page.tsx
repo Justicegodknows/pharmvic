@@ -1,6 +1,5 @@
 'use client'
 
-import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -80,9 +79,14 @@ export default function DocumentsPage(): ReactElement {
     }
 
     async function handleDelete(id: string) {
-        const supabase = createClient()
-        await supabase.from('documents').delete().eq('id', id)
-        setDocuments((prev) => prev.filter((d) => d.id !== id))
+        const res = await fetch('/api/documents', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id }),
+        })
+        if (res.ok) {
+            setDocuments((prev) => prev.filter((d) => d.id !== id))
+        }
     }
 
     function formatSize(bytes: number | null): string {

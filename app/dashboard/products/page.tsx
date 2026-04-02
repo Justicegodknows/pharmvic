@@ -1,6 +1,5 @@
 'use client'
 
-import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -57,23 +56,10 @@ export default function ProductsPage(): ReactElement {
     const [certs, setCerts] = useState('')
 
     const fetchProducts = useCallback(async () => {
-        const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) return
-
-        const { data: supplier } = await supabase
-            .from('suppliers')
-            .select('id')
-            .eq('user_id', user.id)
-            .single()
-
-        if (supplier) {
-            const { data } = await supabase
-                .from('products')
-                .select('*')
-                .eq('supplier_id', supplier.id)
-                .order('name')
-            setProducts(data ?? [])
+        const res = await fetch('/api/suppliers/products')
+        if (res.ok) {
+            const data = await res.json() as Product[]
+            setProducts(data)
         }
         setLoading(false)
     }, [])
@@ -115,9 +101,14 @@ export default function ProductsPage(): ReactElement {
     }
 
     async function handleDelete(id: string) {
-        const supabase = createClient()
-        await supabase.from('products').delete().eq('id', id)
-        setProducts((prev) => prev.filter((p) => p.id !== id))
+        const res = await fetch('/api/suppliers/products', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id }),
+        })
+        if (res.ok) {
+            setProducts((prev) => prev.filter((p) => p.id !== id))
+        }
     }
 
     return (

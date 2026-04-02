@@ -1,5 +1,5 @@
 import { convertToModelMessages, streamText, stepCountIs, type UIMessage, type Tool } from 'ai'
-import { getModel } from '@/app/lib/ai'
+import { getModel, checkOllamaHealth } from '@/app/lib/ai'
 import { PHARMAGENT_SYSTEM_PROMPT, buildSystemPrompt } from '@/app/lib/pharmagent-system-prompt'
 import {
     knowledgeBaseTool,
@@ -49,6 +49,15 @@ export async function POST(request: Request): Promise<Response> {
         return new Response(
             JSON.stringify({ error: 'messages array required' }),
             { status: 400, headers: { 'Content-Type': 'application/json' } }
+        )
+    }
+
+    // Verify Ollama is reachable before attempting to stream
+    const health = await checkOllamaHealth()
+    if (!health.ok) {
+        return new Response(
+            JSON.stringify({ error: `AI backend unavailable: ${health.reason}` }),
+            { status: 503, headers: { 'Content-Type': 'application/json' } }
         )
     }
 

@@ -60,7 +60,7 @@ export default function HomePage(): ReactElement {
   return (
     <div className="flex flex-col">
       {/* Hero */}
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary/5 via-background to-accent/10 py-20 sm:py-28 lg:py-36">
+      <section className="relative overflow-hidden bg-linear-to-br from-primary/5 via-background to-accent/10 py-20 sm:py-28 lg:py-36">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
           <div className="mx-auto max-w-3xl text-center">
             <Badge variant="secondary" className="mb-4">
