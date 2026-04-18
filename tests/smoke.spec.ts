@@ -6,21 +6,26 @@ test.describe('Smoke Tests — Public Pages', () => {
         await expect(page).toHaveTitle(/PharmConnect/);
         await expect(page.locator('nav')).toBeVisible();
         await expect(page.locator('footer')).toBeVisible();
-        await expect(page.getByText('Verified Suppliers')).toBeVisible();
+        await expect(page.getByText('Compliance Alerts')).toBeVisible();
+        await expect(page.getByText('Active Partnerships')).toBeVisible();
     });
 
-    test('marketplace page loads', async ({ page }) => {
+    test('marketplace page loads with heading', async ({ page }) => {
         await page.goto('/marketplace');
         await expect(page).toHaveTitle(/PharmConnect/);
-        await expect(page.locator('nav')).toBeVisible();
+        await expect(page.getByRole('heading', { name: /Marketplace/ })).toBeVisible();
     });
 
-    test('regulatory guide page loads', async ({ page }) => {
+    test('regulatory guide page loads with heading', async ({ page }) => {
         await page.goto('/regulatory-guide');
         await expect(page).toHaveTitle(/PharmConnect/);
         await expect(page.getByRole('heading', { name: /Regulatory Guide/ })).toBeVisible();
+    });
+
+    test('agent chat page loads', async ({ page }) => {
         await page.goto('/agent-chat');
         await expect(page).toHaveTitle(/PharmConnect/);
+        await expect(page.locator('nav')).toBeVisible();
     });
 
     test('login page loads with sign-in form', async ({ page }) => {

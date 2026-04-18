@@ -12,10 +12,14 @@ services:
       - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
       # Docker PostgreSQL — all business data
       - DATABASE_URL=postgresql://${POSTGRES_USER:-pharmvic}:${POSTGRES_PASSWORD:-pharmvic}@postgres:5432/${POSTGRES_DB:-pharmvic}
-      # AI
+      # Embeddings (Ollama — stays in compose)
       - OLLAMA_BASE_URL=http://ollama:11434
-      - OLLAMA_MODEL=${OLLAMA_MODEL:-llama3}
-      - OLLAMA_EMBEDDING_MODEL=${OLLAMA_EMBEDDING_MODEL:-nomic-embed-text}
+      - OLLAMA_EMBEDDING_MODEL=${OLLAMA_EMBEDDING_MODEL:-mxbai-embed-large}
+      # Chat LLM — Docker Model Runner (OpenAI-compatible)
+      # model-runner.docker.internal resolves to the host's Docker Model Runner
+      - LLM_BASE_URL=${LLM_BASE_URL:-http://model-runner.docker.internal/engines/llama.cpp/v1}
+      - LLM_MODEL=${LLM_MODEL:-hf.co/MiniMaxAI/MiniMax-M2.7}
+      - LLM_API_KEY=${LLM_API_KEY:-docker-model-runner}
       # Misc
       - BRAVE_SEARCH_API_KEY=${BRAVE_SEARCH_API_KEY:-}
       - SEARXNG_URL=${SEARXNG_URL:-}
@@ -28,6 +32,9 @@ services:
         condition: service_healthy
       ollama:
         condition: service_started
+    extra_hosts:
+      # Allows the app container to reach Docker Model Runner on the host
+      - "model-runner.docker.internal:host-gateway"
     networks:
       - pharmconnect-net
     restart: unless-stopped
