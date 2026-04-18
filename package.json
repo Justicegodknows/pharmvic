@@ -10,7 +10,10 @@
     "test": "playwright test",
     "test:ui": "playwright test --ui",
     "crawl:nafdac": "tsx app/lib/crawl-nafdac.ts",
-    "crawl:customs": "tsx app/lib/crawl-customs.ts"
+    "crawl:nafdac:zyte": "tsx app/lib/crawl-nafdac-zyte.ts",
+    "crawl:customs": "tsx app/lib/crawl-customs.ts",
+    "crawl:customs:zyte": "tsx app/lib/crawl-customs-zyte.ts",
+    "crawl:bfarm": "tsx app/lib/crawl-bfarm.ts"
   },
   "dependencies": {
     "@ai-sdk/azure": "^3.0.54",

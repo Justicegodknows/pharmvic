@@ -13,6 +13,10 @@ export default async function MarketplacePage({
     const params = await searchParams
 
     // Build a single query with optional filters
+    const q = params.q ?? null
+    const cert = params.cert ?? null
+    const category = params.category ?? null
+
     const suppliers = await sql`
         SELECT DISTINCT ON (s.id)
             s.id, s.company_name, s.description, s.certifications, s.verified, s.logo_url,
@@ -23,12 +27,12 @@ export default async function MarketplacePage({
         FROM suppliers s
         LEFT JOIN products p ON p.supplier_id = s.id
         WHERE
-            (${params.q ?? null} IS NULL
+            (${q}::text IS NULL
                 OR s.company_name ILIKE ${'%' + (params.q ?? '') + '%'}
                 OR s.description  ILIKE ${'%' + (params.q ?? '') + '%'})
-            AND (${params.cert ?? null} IS NULL
-                OR s.certifications @> ARRAY[${params.cert ?? ''}])
-            AND (${params.category ?? null} IS NULL
+            AND (${cert}::text IS NULL
+                OR s.certifications @> ARRAY[${cert}])
+            AND (${category}::text IS NULL
                 OR EXISTS (
                     SELECT 1 FROM products p2
                     WHERE p2.supplier_id = s.id

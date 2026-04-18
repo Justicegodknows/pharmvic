@@ -95,6 +95,11 @@ npm test
 # Run tests with interactive Playwright UI
 npm run test:ui
 
+# Crawl NAFDAC website via Zyte API and ingest into RAG knowledge base
+# Requires ZYTE_API_KEY and RAG_ADMIN_API_KEY in .env.local
+# App dev server must be running (npm run dev) before executing
+npm run crawl:nafdac:zyte
+
 # Crawl NAFDAC website and ingest into RAG knowledge base
 # Requires FIRECRAWL_API_KEY and RAG_ADMIN_API_KEY in .env.local
 npm run crawl:nafdac
@@ -225,6 +230,69 @@ OPENAI_API_KEY=             # Required for AI features
 - **Named exports**: Prefer named exports for components and utilities. Use default export only for Next.js page/layout/route files (which Next.js requires as default).
 - **File naming**: `kebab-case` for directories and files. Components use `PascalCase` for the exported name but `kebab-case` for the filename (e.g., `app/components/chat-input.tsx` exports `ChatInput`).
 - **No barrel files** (`index.ts` re-exporting everything) — they break tree-shaking in the App Router.
+
+## NAFDAC RAG Crawler (Zyte API)
+
+The `crawl:nafdac:zyte` script indexes the full NAFDAC website into Docker PostgreSQL (pgvector) so every AI agent tool can retrieve regulatory information via semantic search.
+
+### Architecture
+
+```
+nafdac.gov.ng/sitemap.xml
+      │  (WordPress XML sitemap)
+      ▼
+app/lib/nafdac-sitemap.ts     — Discovers & scores URLs (priority 1–3)
+      │
+      ▼
+app/lib/zyte-client.ts        — Zyte API v1 REST client (article autoextract)
+      │  (concurrent HTTP requests, Basic Auth)
+      ▼
+app/lib/crawl-nafdac-zyte.ts  — Orchestrator script (batching, retry, logging)
+      │
+      ▼
+POST /api/agent/knowledge     — Ingest endpoint (requires RAG_ADMIN_API_KEY)
+      │
+      ▼
+app/lib/rag-ingest.ts         — chunkText → generateEmbeddings (Ollama) → pgvector
+      │
+      ▼
+Docker PostgreSQL              — knowledge_documents + document_chunks (vector(1024))
+      │
+      ▼
+app/lib/tools/knowledge-base.ts — knowledgeBaseTool (cosine similarity search)
+```
+
+### URL Priority Tiers
+
+| Priority | Content type | Examples |
+|---|---|---|
+| **3** | Core regulatory | `/drugs/`, `/resources/guidelines/`, `/our-services/`, `/narcotics/`, `/export` |
+| **2** | Informational | Press releases, recalls, alerts, FAQs, `/about-nafdac/` |
+| **1** | General | All other NAFDAC pages |
+
+Default run uses `MIN_PRIORITY=2` — targets ~regulatory + informational pages.
+
+### Environment Variables
+
+| Variable | Required | Default | Purpose |
+|---|---|---|---|
+| `ZYTE_API_KEY` | ✅ | — | Zyte API authentication key |
+| `RAG_ADMIN_API_KEY` | ✅ | — | Knowledge ingest endpoint auth |
+| `NEXT_PUBLIC_APP_URL` | — | `http://localhost:3000` | Running app URL |
+| `NAFDAC_MAX_PAGES` | — | `200` | Page cap |
+| `NAFDAC_MIN_PRIORITY` | — | `2` | Lowest priority tier to crawl |
+| `NAFDAC_CONCURRENCY` | — | `5` | Parallel Zyte API requests |
+
+### Key Files
+
+| File | Purpose |
+|---|---|
+| `app/lib/zyte-client.ts` | Typed Zyte API v1 REST client with batch support |
+| `app/lib/nafdac-sitemap.ts` | WordPress sitemap parser + URL scoring |
+| `app/lib/crawl-nafdac-zyte.ts` | Main crawler/ingestion orchestrator |
+| `app/lib/rag-ingest.ts` | Chunk → embed → pgvector pipeline |
+| `app/lib/embeddings.ts` | Ollama `nomic-embed-text` (1024-dim vectors) |
+| `app/lib/tools/knowledge-base.ts` | Agent RAG retrieval tool (cosine similarity) |
 
 ---
 
