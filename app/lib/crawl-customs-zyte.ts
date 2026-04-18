@@ -181,6 +181,15 @@ async function main(): Promise<void> {
                     return
                 }
 
+                // Skip 404 / error pages and WordPress media attachment pages
+                const ERROR_TITLES = /^(page not found|404|not found|error|access denied|forbidden|dsc_|img_|photo_)/i
+                const ERROR_CONTENT = /(page not found|404 not found|the page you requested could not be found)/i
+                if (ERROR_TITLES.test(title.trim()) || ERROR_CONTENT.test(content.slice(0, 500))) {
+                    console.log(`  SKIP (404/error page): ${url}`)
+                    skipped++
+                    return
+                }
+
                 process.stdout.write(`  INGEST [P${priority}] ${title} (${content.length} chars)\n`)
 
                 try {
