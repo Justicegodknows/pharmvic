@@ -4,18 +4,24 @@ import type { ReactElement } from 'react'
 import { NavbarClient } from './navbar-client'
 
 export async function Navbar(): Promise<ReactElement> {
-    const supabase = await createClient()
-    const { data } = await supabase.auth.getUser()
-    const user = data.user
-
+    let user = null
     let profile: { role: string; full_name: string } | null = null
-    if (user) {
-        const { data: profileData } = await supabase
-            .from('profiles')
-            .select('role, full_name')
-            .eq('id', user.id)
-            .single()
-        profile = profileData
+
+    try {
+        const supabase = await createClient()
+        const { data } = await supabase.auth.getUser()
+        user = data.user
+
+        if (user) {
+            const { data: profileData } = await supabase
+                .from('profiles')
+                .select('role, full_name')
+                .eq('id', user.id)
+                .single()
+            profile = profileData
+        }
+    } catch {
+        // Supabase unreachable or env vars missing — render navbar in logged-out state
     }
 
     return (
