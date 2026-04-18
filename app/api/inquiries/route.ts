@@ -1,7 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
+import sql from '@/lib/db/client'
 import { NextResponse } from 'next/server'
 
 export async function GET(): Promise<Response> {
+    // Auth via Supabase
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
@@ -9,26 +11,22 @@ export async function GET(): Promise<Response> {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Get vendor record
-    const { data: vendor } = await supabase
-        .from('vendors')
-        .select('id')
-        .eq('user_id', user.id)
-        .single()
+    // Get vendor record from Docker DB
+    const [vendor] = await sql`
+        SELECT id FROM vendors WHERE user_id = ${user.id} LIMIT 1
+    `
 
     if (!vendor) {
         return NextResponse.json({ error: 'Vendor not found' }, { status: 404 })
     }
 
-    const { data: inquiries, error } = await supabase
-        .from('inquiries')
-        .select('*, suppliers:supplier_id(company_name)')
-        .eq('vendor_id', vendor.id)
-        .order('created_at', { ascending: false })
-
-    if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 })
-    }
+    const inquiries = await sql`
+        SELECT i.*, s.company_name AS supplier_company_name
+        FROM inquiries i
+        JOIN suppliers s ON s.id = i.supplier_id
+        WHERE i.vendor_id = ${vendor.id}
+        ORDER BY i.created_at DESC
+    `
 
     return NextResponse.json(inquiries)
 }
@@ -51,30 +49,20 @@ export async function POST(request: Request): Promise<Response> {
         return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
     }
 
-    const { data: vendor } = await supabase
-        .from('vendors')
-        .select('id')
-        .eq('user_id', user.id)
-        .single()
+    const [vendor] = await sql`
+        SELECT id FROM vendors WHERE user_id = ${user.id} LIMIT 1
+    `
 
     if (!vendor) {
         return NextResponse.json({ error: 'Vendor record not found' }, { status: 404 })
     }
 
-    const { data, error } = await supabase
-        .from('inquiries')
-        .insert({
-            vendor_id: vendor.id,
-            supplier_id: body.supplier_id,
-            subject: body.subject,
-            message: body.message,
-        })
-        .select()
-        .single()
-
-    if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 })
-    }
+    const [data] = await sql`
+        INSERT INTO inquiries (vendor_id, supplier_id, subject, message)
+        VALUES (${vendor.id}, ${body.supplier_id}, ${body.subject}, ${body.message})
+        RETURNING *
+    `
 
     return NextResponse.json(data, { status: 201 })
 }
+

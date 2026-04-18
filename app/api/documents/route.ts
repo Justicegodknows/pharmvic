@@ -1,5 +1,12 @@
 import { createClient } from '@/lib/supabase/server'
+import sql from '@/lib/db/client'
 import { NextResponse } from 'next/server'
+import { writeFile, mkdir, unlink } from 'fs/promises'
+import { join } from 'path'
+
+// Uploads are stored in a Docker volume mounted at /app/uploads (prod)
+// or the project root uploads/ directory (dev).
+const UPLOADS_DIR = process.env.UPLOADS_DIR ?? join(process.cwd(), 'uploads')
 
 export async function GET(): Promise<Response> {
     const supabase = await createClient()
@@ -9,25 +16,19 @@ export async function GET(): Promise<Response> {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data: vendor } = await supabase
-        .from('vendors')
-        .select('id')
-        .eq('user_id', user.id)
-        .single()
+    const [vendor] = await sql`
+        SELECT id FROM vendors WHERE user_id = ${user.id} LIMIT 1
+    `
 
     if (!vendor) {
         return NextResponse.json({ error: 'Vendor not found' }, { status: 404 })
     }
 
-    const { data: documents, error } = await supabase
-        .from('documents')
-        .select('*')
-        .eq('vendor_id', vendor.id)
-        .order('uploaded_at', { ascending: false })
-
-    if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 })
-    }
+    const documents = await sql`
+        SELECT * FROM documents
+        WHERE vendor_id = ${vendor.id}
+        ORDER BY uploaded_at DESC
+    `
 
     return NextResponse.json(documents)
 }
@@ -40,11 +41,9 @@ export async function POST(request: Request): Promise<Response> {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { data: vendor } = await supabase
-        .from('vendors')
-        .select('id')
-        .eq('user_id', user.id)
-        .single()
+    const [vendor] = await sql`
+        SELECT id FROM vendors WHERE user_id = ${user.id} LIMIT 1
+    `
 
     if (!vendor) {
         return NextResponse.json({ error: 'Vendor not found' }, { status: 404 })
@@ -58,35 +57,19 @@ export async function POST(request: Request): Promise<Response> {
         return NextResponse.json({ error: 'File and doc_type required' }, { status: 400 })
     }
 
-    // Upload to Supabase Storage
-    const filePath = `${user.id}/${Date.now()}-${file.name}`
-    const { error: uploadError } = await supabase.storage
-        .from('documents')
-        .upload(filePath, file)
+    // Save file to local uploads volume
+    const relativePath = `${user.id}/${Date.now()}-${file.name}`
+    const absolutePath = join(UPLOADS_DIR, relativePath)
 
-    if (uploadError) {
-        return NextResponse.json({ error: uploadError.message }, { status: 500 })
-    }
+    await mkdir(join(UPLOADS_DIR, user.id), { recursive: true })
+    const buffer = Buffer.from(await file.arrayBuffer())
+    await writeFile(absolutePath, buffer)
 
-    const { data: urlData } = supabase.storage
-        .from('documents')
-        .getPublicUrl(filePath)
-
-    const { data: doc, error: dbError } = await supabase
-        .from('documents')
-        .insert({
-            vendor_id: vendor.id,
-            doc_type: docType,
-            file_name: file.name,
-            file_url: urlData.publicUrl,
-            file_size: file.size,
-        })
-        .select()
-        .single()
-
-    if (dbError) {
-        return NextResponse.json({ error: dbError.message }, { status: 500 })
-    }
+    const [doc] = await sql`
+        INSERT INTO documents (vendor_id, doc_type, file_name, file_path, file_size)
+        VALUES (${vendor.id}, ${docType}, ${file.name}, ${relativePath}, ${file.size})
+        RETURNING *
+    `
 
     return NextResponse.json(doc, { status: 201 })
 }
@@ -105,25 +88,32 @@ export async function DELETE(request: Request): Promise<Response> {
         return NextResponse.json({ error: 'id required' }, { status: 400 })
     }
 
-    const { data: vendor } = await supabase
-        .from('vendors')
-        .select('id')
-        .eq('user_id', user.id)
-        .single()
+    const [vendor] = await sql`
+        SELECT id FROM vendors WHERE user_id = ${user.id} LIMIT 1
+    `
 
     if (!vendor) {
         return NextResponse.json({ error: 'Vendor not found' }, { status: 404 })
     }
 
-    // Only delete if the document belongs to this vendor
-    const { error } = await supabase
-        .from('documents')
-        .delete()
-        .eq('id', id)
-        .eq('vendor_id', vendor.id)
+    // Fetch the record first to get the file path, and verify ownership
+    const [doc] = await sql`
+        SELECT id, file_path FROM documents
+        WHERE id = ${id} AND vendor_id = ${vendor.id}
+        LIMIT 1
+    `
 
-    if (error) {
-        return NextResponse.json({ error: error.message }, { status: 500 })
+    if (!doc) {
+        return NextResponse.json({ error: 'Document not found' }, { status: 404 })
+    }
+
+    // Delete from DB then remove file from disk (best-effort)
+    await sql`DELETE FROM documents WHERE id = ${id}`
+
+    try {
+        await unlink(join(UPLOADS_DIR, doc.file_path as string))
+    } catch {
+        // File may already be gone; don't fail the request
     }
 
     return NextResponse.json({ success: true })

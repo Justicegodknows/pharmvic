@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import sql from '@/lib/db/client'
 import { SupplierCard } from '@/app/components/supplier-card'
 import { SearchFilter } from './search-filter'
 import type { ReactElement } from 'react'
@@ -11,31 +11,32 @@ export default async function MarketplacePage({
     searchParams,
 }: MarketplacePageProps): Promise<ReactElement> {
     const params = await searchParams
-    const supabase = await createClient()
 
-    let query = supabase
-        .from('suppliers')
-        .select('id, company_name, description, certifications, verified, logo_url, products:products(category)')
-        .order('verified', { ascending: false })
-        .order('company_name')
-
-    if (params.q) {
-        query = query.or(`company_name.ilike.%${params.q}%,description.ilike.%${params.q}%`)
-    }
-
-    if (params.cert) {
-        query = query.contains('certifications', [params.cert])
-    }
-
-    const { data: suppliers } = await query
-
-    // Client-side category filter (products is a nested relation)
-    let filtered = suppliers ?? []
-    if (params.category) {
-        filtered = filtered.filter((s) =>
-            s.products.some((p: { category: string }) => p.category === params.category)
-        )
-    }
+    // Build a single query with optional filters
+    const suppliers = await sql`
+        SELECT DISTINCT ON (s.id)
+            s.id, s.company_name, s.description, s.certifications, s.verified, s.logo_url,
+            COALESCE(
+                json_agg(json_build_object('category', p.category)) FILTER (WHERE p.id IS NOT NULL),
+                '[]'
+            ) AS products
+        FROM suppliers s
+        LEFT JOIN products p ON p.supplier_id = s.id
+        WHERE
+            (${params.q ?? null} IS NULL
+                OR s.company_name ILIKE ${'%' + (params.q ?? '') + '%'}
+                OR s.description  ILIKE ${'%' + (params.q ?? '') + '%'})
+            AND (${params.cert ?? null} IS NULL
+                OR s.certifications @> ARRAY[${params.cert ?? ''}])
+            AND (${params.category ?? null} IS NULL
+                OR EXISTS (
+                    SELECT 1 FROM products p2
+                    WHERE p2.supplier_id = s.id
+                      AND p2.category ILIKE ${'%' + (params.category ?? '') + '%'}
+                ))
+        GROUP BY s.id
+        ORDER BY s.id, s.verified DESC, s.company_name
+    `
 
     return (
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -50,21 +51,21 @@ export default async function MarketplacePage({
                 <SearchFilter />
             </div>
 
-            {filtered.length === 0 ? (
+            {suppliers.length === 0 ? (
                 <div className="rounded-lg border border-dashed border-border p-12 text-center">
                     <p className="text-muted-foreground">No suppliers found matching your criteria.</p>
                     <p className="mt-1 text-sm text-muted-foreground">Try adjusting your search or filters.</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                    {filtered.map((supplier) => (
-                        <SupplierCard key={supplier.id} supplier={supplier} />
+                    {suppliers.map((supplier) => (
+                        <SupplierCard key={supplier.id as string} supplier={supplier as Parameters<typeof SupplierCard>[0]['supplier']} />
                     ))}
                 </div>
             )}
 
             <div className="mt-8 text-center text-sm text-muted-foreground">
-                Showing {filtered.length} supplier{filtered.length !== 1 ? 's' : ''}
+                Showing {suppliers.length} supplier{suppliers.length !== 1 ? 's' : ''}
             </div>
         </div>
     )

@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import sql from '@/lib/db/client'
 import { Badge } from '@/components/ui/badge'
 import { Card } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
@@ -14,6 +14,17 @@ import { notFound } from 'next/navigation'
 import { InquiryForm } from './inquiry-form'
 import type { ReactElement } from 'react'
 
+type Product = {
+    id: string
+    name: string
+    description: string | null
+    hs_code: string | null
+    category: string
+    min_order_qty: number | null
+    unit: string | null
+    certifications: string[]
+}
+
 type SupplierProfilePageProps = {
     params: Promise<{ supplierId: string }>
 }
@@ -22,17 +33,22 @@ export default async function SupplierProfilePage({
     params,
 }: SupplierProfilePageProps): Promise<ReactElement> {
     const { supplierId } = await params
-    const supabase = await createClient()
 
-    const { data: supplier } = await supabase
-        .from('suppliers')
-        .select('*, products(*)')
-        .eq('id', supplierId)
-        .single()
+    const [supplier] = await sql`
+        SELECT s.*, json_agg(p.*) FILTER (WHERE p.id IS NOT NULL) AS products
+        FROM suppliers s
+        LEFT JOIN products p ON p.supplier_id = s.id
+        WHERE s.id = ${supplierId}
+        GROUP BY s.id
+        LIMIT 1
+    `
 
     if (!supplier) {
         notFound()
     }
+
+    // Normalise: products may be null when no products exist
+    const products = ((supplier.products as unknown[] | null) ?? []) as Product[]
 
     return (
         <div className="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
@@ -128,20 +144,11 @@ export default async function SupplierProfilePage({
                             <PackageIcon className="mr-2 inline h-5 w-5" />
                             Product Catalogue
                         </h2>
-                        {supplier.products.length === 0 ? (
+                        {products.length === 0 ? (
                             <p className="text-sm text-muted-foreground">No products listed yet.</p>
                         ) : (
                             <div className="space-y-4">
-                                {supplier.products.map((product: {
-                                    id: string
-                                    name: string
-                                    description: string | null
-                                    hs_code: string | null
-                                    category: string
-                                    min_order_qty: number | null
-                                    unit: string | null
-                                    certifications: string[]
-                                }) => (
+                                {products.map((product) => (
                                     <div key={product.id} className="rounded-lg border border-border p-4">
                                         <div className="flex items-start justify-between">
                                             <div>

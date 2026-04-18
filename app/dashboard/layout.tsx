@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import sql from '@/lib/db/client'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { cn } from '@/lib/utils'
@@ -36,6 +37,7 @@ export default async function DashboardLayout({
 }: {
     children: ReactNode
 }): Promise<ReactElement> {
+    // Auth only via Supabase
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
@@ -43,11 +45,13 @@ export default async function DashboardLayout({
         redirect('/auth/login?redirect=/dashboard')
     }
 
-    const { data: profile } = await supabase
-        .from('profiles')
-        .select('role, full_name, company_name')
-        .eq('id', user.id)
-        .single()
+    // Profile from Docker DB
+    const [profile] = await sql`
+        SELECT role, full_name, company_name
+        FROM profiles
+        WHERE id = ${user.id}
+        LIMIT 1
+    `
 
     const navItems = profile?.role === 'supplier' ? SUPPLIER_NAV : VENDOR_NAV
 

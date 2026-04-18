@@ -1,4 +1,5 @@
 import { createClient } from '@/lib/supabase/server'
+import sql from '@/lib/db/client'
 import { redirect } from 'next/navigation'
 import {
     InboxIcon,
@@ -10,65 +11,44 @@ import Link from 'next/link'
 import type { ReactElement } from 'react'
 
 export default async function DashboardPage(): Promise<ReactElement> {
+    // Auth via Supabase
     const supabase = await createClient()
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) redirect('/auth/login')
 
-    const { data: profile } = await supabase
-        .from('profiles')
-        .select('role, full_name, company_name')
-        .eq('id', user.id)
-        .single()
+    // Profile + stats from Docker DB
+    const [profile] = await sql`
+        SELECT role, full_name, company_name FROM profiles WHERE id = ${user.id} LIMIT 1
+    `
 
     const isVendor = profile?.role === 'vendor'
     const isSupplier = profile?.role === 'supplier'
 
-    // Fetch stats
     let inquiryCount = 0
     let documentCount = 0
     let productCount = 0
 
     if (isVendor) {
-        const { data: vendor } = await supabase
-            .from('vendors')
-            .select('id')
-            .eq('user_id', user.id)
-            .single()
-
+        const [vendor] = await sql`
+            SELECT id FROM vendors WHERE user_id = ${user.id} LIMIT 1
+        `
         if (vendor) {
-            const { count: ic } = await supabase
-                .from('inquiries')
-                .select('*', { count: 'exact', head: true })
-                .eq('vendor_id', vendor.id)
+            const [{ count: ic }] = await sql`SELECT COUNT(*)::int AS count FROM inquiries WHERE vendor_id = ${vendor.id}`
+            const [{ count: dc }] = await sql`SELECT COUNT(*)::int AS count FROM documents WHERE vendor_id = ${vendor.id}`
             inquiryCount = ic ?? 0
-
-            const { count: dc } = await supabase
-                .from('documents')
-                .select('*', { count: 'exact', head: true })
-                .eq('vendor_id', vendor.id)
             documentCount = dc ?? 0
         }
     }
 
     if (isSupplier) {
-        const { data: supplier } = await supabase
-            .from('suppliers')
-            .select('id')
-            .eq('user_id', user.id)
-            .single()
-
+        const [supplier] = await sql`
+            SELECT id FROM suppliers WHERE user_id = ${user.id} LIMIT 1
+        `
         if (supplier) {
-            const { count: ic } = await supabase
-                .from('inquiries')
-                .select('*', { count: 'exact', head: true })
-                .eq('supplier_id', supplier.id)
+            const [{ count: ic }] = await sql`SELECT COUNT(*)::int AS count FROM inquiries WHERE supplier_id = ${supplier.id}`
+            const [{ count: pc }] = await sql`SELECT COUNT(*)::int AS count FROM products WHERE supplier_id = ${supplier.id}`
             inquiryCount = ic ?? 0
-
-            const { count: pc } = await supabase
-                .from('products')
-                .select('*', { count: 'exact', head: true })
-                .eq('supplier_id', supplier.id)
             productCount = pc ?? 0
         }
     }

@@ -1,6 +1,6 @@
 import { tool } from 'ai'
 import { z } from 'zod'
-import { createAdminClient } from '@/lib/supabase/admin'
+import sql from '@/lib/db/client'
 import { generateEmbedding } from '@/app/lib/embeddings'
 
 /**
@@ -19,18 +19,30 @@ export const knowledgeBaseTool = tool({
     }),
     execute: async ({ query, sourceFilter, maxResults }) => {
         const embedding = await generateEmbedding(query)
-        const supabase = createAdminClient()
+        const embeddingStr = JSON.stringify(embedding)
+        const threshold = 0.4
+        const limit = maxResults ?? 5
 
-        const { data, error } = await supabase.rpc('match_chunks_by_source', {
-            query_embedding: JSON.stringify(embedding),
-            source_filter: sourceFilter ?? null,
-            match_threshold: 0.4,
-            match_count: maxResults ?? 5,
-        })
-
-        if (error) {
-            return { error: `Knowledge base search failed: ${error.message}`, results: [] }
-        }
+        const data = sourceFilter
+            ? await sql`
+                SELECT * FROM match_chunks_by_source(
+                    ${embeddingStr}::vector(1024),
+                    ${sourceFilter},
+                    ${threshold},
+                    ${limit}
+                )
+              `
+            : await sql`
+                SELECT
+                    dc.id, dc.document_id, dc.content, dc.metadata,
+                    kd.title AS document_title, kd.source_type,
+                    1 - (dc.embedding <=> ${embeddingStr}::vector(1024)) AS similarity
+                FROM document_chunks dc
+                JOIN knowledge_documents kd ON kd.id = dc.document_id
+                WHERE 1 - (dc.embedding <=> ${embeddingStr}::vector(1024)) > ${threshold}
+                ORDER BY dc.embedding <=> ${embeddingStr}::vector(1024)
+                LIMIT ${limit}
+              `
 
         if (!data || data.length === 0) {
             return {
@@ -39,18 +51,11 @@ export const knowledgeBaseTool = tool({
             }
         }
 
-        const results = (data as {
-            id: string
-            document_id: string
-            content: string
-            document_title: string
-            source_type: string
-            similarity: number
-        }[]).map((chunk) => ({
-            title: chunk.document_title,
-            sourceType: chunk.source_type,
-            content: chunk.content,
-            relevance: Math.round(chunk.similarity * 100) + '%',
+        const results = data.map((chunk) => ({
+            title: chunk.document_title as string,
+            sourceType: chunk.source_type as string,
+            content: chunk.content as string,
+            relevance: Math.round((chunk.similarity as number) * 100) + '%',
         }))
 
         return {

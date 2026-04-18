@@ -22,6 +22,7 @@ export function InquiryForm({ supplierId, supplierName }: InquiryFormProps): Rea
         setLoading(true)
         setStatus('idle')
 
+        // Auth check via Supabase (client-side)
         const supabase = createClient()
         const { data: { user } } = await supabase.auth.getUser()
 
@@ -31,32 +32,19 @@ export function InquiryForm({ supplierId, supplierName }: InquiryFormProps): Rea
             return
         }
 
-        // Get vendor record
-        const { data: vendor } = await supabase
-            .from('vendors')
-            .select('id')
-            .eq('user_id', user.id)
-            .single()
-
-        if (!vendor) {
-            setStatus('error')
-            setLoading(false)
-            return
-        }
-
-        const { error } = await supabase.from('inquiries').insert({
-            vendor_id: vendor.id,
-            supplier_id: supplierId,
-            subject,
-            message,
+        // Data mutation goes through the API route (which uses Docker PostgreSQL)
+        const res = await fetch('/api/inquiries', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ supplier_id: supplierId, subject, message }),
         })
 
-        if (error) {
-            setStatus('error')
-        } else {
+        if (res.ok) {
             setStatus('success')
             setSubject('')
             setMessage('')
+        } else {
+            setStatus('error')
         }
 
         setLoading(false)

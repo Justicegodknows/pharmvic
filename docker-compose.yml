@@ -6,21 +6,51 @@ services:
     ports:
       - "3000:3000"
     environment:
+      # Supabase — auth only
       - NEXT_PUBLIC_SUPABASE_URL=${NEXT_PUBLIC_SUPABASE_URL}
       - NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=${NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY}
       - SUPABASE_SERVICE_ROLE_KEY=${SUPABASE_SERVICE_ROLE_KEY}
+      # Docker PostgreSQL — all business data
+      - DATABASE_URL=postgresql://${POSTGRES_USER:-pharmvic}:${POSTGRES_PASSWORD:-pharmvic}@postgres:5432/${POSTGRES_DB:-pharmvic}
+      # AI
       - OLLAMA_BASE_URL=http://ollama:11434
       - OLLAMA_MODEL=${OLLAMA_MODEL:-llama3}
       - OLLAMA_EMBEDDING_MODEL=${OLLAMA_EMBEDDING_MODEL:-nomic-embed-text}
+      # Misc
       - BRAVE_SEARCH_API_KEY=${BRAVE_SEARCH_API_KEY:-}
       - SEARXNG_URL=${SEARXNG_URL:-}
       - RAG_ADMIN_API_KEY=${RAG_ADMIN_API_KEY:-}
       - NEXT_PUBLIC_APP_URL=http://localhost:3000
+    volumes:
+      - uploads_data:/app/uploads
     depends_on:
-      - ollama
+      postgres:
+        condition: service_healthy
+      ollama:
+        condition: service_started
     networks:
       - pharmconnect-net
     restart: unless-stopped
+
+  postgres:
+    image: pgvector/pgvector:pg16
+    ports:
+      - "5432:5432"
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-pharmvic}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pharmvic}
+      POSTGRES_DB: ${POSTGRES_DB:-pharmvic}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./docker/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    networks:
+      - pharmconnect-net
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-pharmvic} -d ${POSTGRES_DB:-pharmvic}" ]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   ollama:
     image: ollama/ollama:latest
@@ -41,6 +71,8 @@ services:
     #           capabilities: [gpu]
 
 volumes:
+  postgres_data:
+  uploads_data:
   ollama_data:
 
 

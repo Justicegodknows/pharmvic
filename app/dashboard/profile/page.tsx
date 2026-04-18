@@ -1,6 +1,5 @@
 'use client'
 
-import { createClient } from '@/lib/supabase/client'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
@@ -35,17 +34,9 @@ export default function SupplierProfilePage(): ReactElement {
     const [certifications, setCertifications] = useState('')
 
     const fetchProfile = useCallback(async () => {
-        const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) return
-
-        const { data } = await supabase
-            .from('suppliers')
-            .select('*')
-            .eq('user_id', user.id)
-            .single()
-
-        if (data) {
+        const res = await fetch('/api/profile/supplier')
+        if (res.ok) {
+            const data = await res.json() as SupplierProfile
             setProfile(data)
             setCompanyName(data.company_name)
             setDescription(data.description ?? '')
@@ -68,11 +59,7 @@ export default function SupplierProfilePage(): ReactElement {
         setSaving(true)
         setSuccess(false)
 
-        const supabase = createClient()
-        const { data: { user } } = await supabase.auth.getUser()
-        if (!user) return
-
-        const updates = {
+        const body = {
             company_name: companyName,
             description: description || null,
             address: address || null,
@@ -82,11 +69,11 @@ export default function SupplierProfilePage(): ReactElement {
             certifications: certifications.split(',').map((s) => s.trim()).filter(Boolean),
         }
 
-        if (profile) {
-            await supabase.from('suppliers').update(updates).eq('id', profile.id)
-        } else {
-            await supabase.from('suppliers').insert({ ...updates, user_id: user.id })
-        }
+        await fetch('/api/profile/supplier', {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(body),
+        })
 
         setSuccess(true)
         setSaving(false)
