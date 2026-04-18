@@ -107,6 +107,16 @@ npm run crawl:nafdac
 # Crawl Nigerian Customs website and ingest into RAG knowledge base
 # Requires FIRECRAWL_API_KEY and RAG_ADMIN_API_KEY in .env.local
 npm run crawl:customs
+
+# Build and push app image to DigitalOcean Container Registry
+# Requires DO_REGISTRY_TOKEN in .env.local or environment
+# Optionally pass a version tag: bash scripts/deploy.sh v1.2.3
+bash scripts/deploy.sh
+
+# Run the production image on a server (after pulling from DOCR)
+# IMAGE_TAG defaults to 'latest'
+IMAGE_TAG=latest docker-compose -f docker-compose.yml -f docker-compose.prod.yml pull app
+IMAGE_TAG=latest docker-compose -f docker-compose.yml -f docker-compose.prod.yml up -d
 ```
 
 ---
@@ -335,7 +345,7 @@ Then add `STITCH_MCP_URL=http://localhost:3001` to your `.env.local`.
 The following were planned but have not been committed. Do not fabricate stubs, configs, or references for them until they are added:
 
 - **Python layer** — no `requirements.txt`, `pyproject.toml`, or Python files exist. Do not create Python files without explicit instruction.
-- **Dockerfile / docker-compose** — no container config is committed. Do not add or reference one.
+- **Dockerfile / docker-compose** — `Dockerfile`, `docker-compose.yml`, and `docker-compose.prod.yml` are committed. `scripts/deploy.sh` builds and pushes to DigitalOcean Container Registry (`registry.digitalocean.com/pharmvic/pharmvic`). Requires `DO_REGISTRY_TOKEN` in environment.
 - **GitHub Actions workflows** — no `.github/` directory exists. Do not reference CI commands.
 - **Test framework** — Playwright is configured. Tests live in `tests/`. Run with `npm test`. Config is in `playwright.config.ts`.
 
