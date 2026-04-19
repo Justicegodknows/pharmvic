@@ -3,6 +3,8 @@ import { z } from 'zod'
 import sql from '@/lib/db/client'
 import { generateEmbedding } from '@/app/lib/embeddings'
 
+type Row = Record<string, unknown>
+
 /**
  * RAG Knowledge Base Retrieval Tool
  * Searches the vector store for relevant pharmaceutical regulatory documents,
@@ -18,31 +20,42 @@ export const knowledgeBaseTool = tool({
             .describe('Number of results to return (default 5)'),
     }),
     execute: async ({ query, sourceFilter, maxResults }) => {
-        const embedding = await generateEmbedding(query)
+        let embedding: number[]
+        try {
+            embedding = await generateEmbedding(query)
+        } catch {
+            return { error: 'Embedding service (Ollama) is currently unavailable. Knowledge base search is offline.', results: [] }
+        }
+
         const embeddingStr = JSON.stringify(embedding)
         const threshold = 0.4
         const limit = maxResults ?? 5
 
-        const data = sourceFilter
-            ? await sql`
-                SELECT * FROM match_chunks_by_source(
-                    ${embeddingStr}::vector(1024),
-                    ${sourceFilter},
-                    ${threshold},
-                    ${limit}
-                )
-              `
-            : await sql`
-                SELECT
-                    dc.id, dc.document_id, dc.content, dc.metadata,
-                    kd.title AS document_title, kd.source_type,
-                    1 - (dc.embedding <=> ${embeddingStr}::vector(1024)) AS similarity
-                FROM document_chunks dc
-                JOIN knowledge_documents kd ON kd.id = dc.document_id
-                WHERE 1 - (dc.embedding <=> ${embeddingStr}::vector(1024)) > ${threshold}
-                ORDER BY dc.embedding <=> ${embeddingStr}::vector(1024)
-                LIMIT ${limit}
-              `
+        let data: Row[]
+        try {
+            data = sourceFilter
+                ? (await sql`
+                    SELECT * FROM match_chunks_by_source(
+                        ${embeddingStr}::vector(1024),
+                        ${sourceFilter},
+                        ${threshold},
+                        ${limit}
+                    )
+                  `) as unknown as Row[]
+                : (await sql`
+                    SELECT
+                        dc.id, dc.document_id, dc.content, dc.metadata,
+                        kd.title AS document_title, kd.source_type,
+                        1 - (dc.embedding <=> ${embeddingStr}::vector(1024)) AS similarity
+                    FROM document_chunks dc
+                    JOIN knowledge_documents kd ON kd.id = dc.document_id
+                    WHERE 1 - (dc.embedding <=> ${embeddingStr}::vector(1024)) > ${threshold}
+                    ORDER BY dc.embedding <=> ${embeddingStr}::vector(1024)
+                    LIMIT ${limit}
+                  `) as unknown as Row[]
+        } catch {
+            return { error: 'Knowledge base database is currently unavailable. Please try again later.', results: [] }
+        }
 
         if (!data || data.length === 0) {
             return {
@@ -51,7 +64,7 @@ export const knowledgeBaseTool = tool({
             }
         }
 
-        const results = data.map((chunk) => ({
+        const results = data.filter(Boolean).map((chunk) => ({
             title: chunk.document_title as string,
             sourceType: chunk.source_type as string,
             content: chunk.content as string,

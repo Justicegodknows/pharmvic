@@ -32,7 +32,7 @@ function checkRateLimit(key: string): boolean {
     return true
 }
 
-export const maxDuration = 120
+export const maxDuration = 28
 
 export async function POST(request: Request): Promise<Response> {
     const ip = request.headers.get('x-forwarded-for') ?? 'anonymous'

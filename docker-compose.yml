@@ -15,11 +15,10 @@ services:
       # Embeddings (Ollama — stays in compose)
       - OLLAMA_BASE_URL=http://ollama:11434
       - OLLAMA_EMBEDDING_MODEL=${OLLAMA_EMBEDDING_MODEL:-mxbai-embed-large}
-      # Chat LLM — Docker Model Runner (OpenAI-compatible)
-      # model-runner.docker.internal resolves to the host's Docker Model Runner
-      - LLM_BASE_URL=${LLM_BASE_URL:-http://model-runner.docker.internal/engines/llama.cpp/v1}
-      - LLM_MODEL=${LLM_MODEL:-hf.co/MiniMaxAI/MiniMax-M2.7}
-      - LLM_API_KEY=${LLM_API_KEY:-docker-model-runner}
+      # Chat LLM — Hugging Face Inference API (OpenAI-compatible)
+      - LLM_BASE_URL=${LLM_BASE_URL:-https://router.huggingface.co/v1}
+      - LLM_MODEL=${LLM_MODEL:-MiniMaxAI/MiniMax-M2.7}
+      - LLM_API_KEY=${LLM_API_KEY:-}
       # Misc
       - BRAVE_SEARCH_API_KEY=${BRAVE_SEARCH_API_KEY:-}
       - SEARXNG_URL=${SEARXNG_URL:-}

@@ -1,16 +1,13 @@
 import { createOpenAICompatible } from "@ai-sdk/openai-compatible";
 
-// Docker Model Runner — OpenAI-compatible API.
-// Local:  http://localhost:12434/engines/llama.cpp/v1
-// Docker: http://model-runner.docker.internal/engines/llama.cpp/v1
-// Cloud:  set LLM_BASE_URL + LLM_API_KEY to any OpenAI-compatible provider.
+// Hugging Face Inference API — OpenAI-compatible.
+// All AI features route through https://router.huggingface.co/v1 using the HF token.
+// Override via environment variables for local dev or alternate providers.
 const LLM_BASE_URL =
-    process.env.LLM_BASE_URL ?? "http://localhost:12434/engines/llama.cpp/v1";
+    process.env.LLM_BASE_URL ?? "https://router.huggingface.co/v1";
 const LLM_MODEL =
-    process.env.LLM_MODEL ?? "hf.co/MiniMaxAI/MiniMax-M2.7";
-// Docker Model Runner does not require auth locally; pass a placeholder so the
-// SDK does not omit the Authorization header for providers that do need it.
-const LLM_API_KEY = process.env.LLM_API_KEY ?? "docker-model-runner";
+    process.env.LLM_MODEL ?? "MiniMaxAI/MiniMax-M2.7";
+const LLM_API_KEY = process.env.LLM_API_KEY ?? "";
 
 const llmProvider = createOpenAICompatible({
     name: "llm",
@@ -39,18 +36,17 @@ export async function checkLLMHealth(): Promise<{ ok: true } | { ok: false; reas
         const models = body.data ?? [];
         const hasModel = models.some((m) => m.id === LLM_MODEL);
         if (!hasModel) {
-            const hint = `Run: docker model run ${LLM_MODEL}`;
             const available = models.map((m) => m.id).join(", ") || "none";
             return {
                 ok: false,
-                reason: `Model "${LLM_MODEL}" not loaded. ${hint}. Available: ${available}`,
+                reason: `Model "${LLM_MODEL}" not available on HF Inference API. Available: ${available}`,
             };
         }
         return { ok: true };
     } catch {
         return {
             ok: false,
-            reason: `Cannot reach LLM backend at ${LLM_BASE_URL}. Is Docker Model Runner active?`,
+            reason: `Cannot reach LLM backend at ${LLM_BASE_URL}. Check LLM_BASE_URL and LLM_API_KEY.`,
         };
     }
 }

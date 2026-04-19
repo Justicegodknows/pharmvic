@@ -2,6 +2,8 @@ import { tool } from 'ai'
 import { z } from 'zod'
 import sql from '@/lib/db/client'
 
+type Row = Record<string, unknown>
+
 /**
  * Supplier Search Tool
  * Queries the Docker PostgreSQL database for German pharmaceutical manufacturers.
@@ -21,19 +23,24 @@ export const supplierSearchTool = tool({
     execute: async ({ query, category, certification, verifiedOnly }) => {
         const verifiedFilter = verifiedOnly !== false
 
-        const suppliers = await sql`
-            SELECT id, company_name, description, certifications, verified, country, website
-            FROM suppliers
-            WHERE
-                (${verifiedFilter} = false OR verified = true)
-                AND (${query ?? null} IS NULL
-                    OR company_name ILIKE ${'%' + (query ?? '') + '%'}
-                    OR description  ILIKE ${'%' + (query ?? '') + '%'})
-                AND (${certification ?? null} IS NULL
-                    OR certifications @> ARRAY[${certification ?? ''}])
-            ORDER BY company_name
-            LIMIT 10
-        `
+        let suppliers: Row[]
+        try {
+            suppliers = (await sql`
+                SELECT id, company_name, description, certifications, verified, country, website
+                FROM suppliers
+                WHERE
+                    (${verifiedFilter} = false OR verified = true)
+                    AND (${query ?? null} IS NULL
+                        OR company_name ILIKE ${'%' + (query ?? '') + '%'}
+                        OR description  ILIKE ${'%' + (query ?? '') + '%'})
+                    AND (${certification ?? null} IS NULL
+                        OR certifications @> ARRAY[${certification ?? ''}])
+                ORDER BY company_name
+                LIMIT 10
+            `) as unknown as Row[]
+        } catch {
+            return { error: 'Supplier database is currently unavailable. Please try again later.', results: [] }
+        }
 
         if (suppliers.length === 0) {
             return { message: 'No suppliers found matching your criteria.', results: [] }
@@ -41,17 +48,22 @@ export const supplierSearchTool = tool({
 
         const supplierIds = suppliers.map((s) => s.id as string)
 
-        const products = await sql`
-            SELECT id, supplier_id, name, description, hs_code, category, min_order_qty, unit, certifications
-            FROM products
-            WHERE supplier_id = ANY(${supplierIds})
-                AND (${category ?? null} IS NULL OR category ILIKE ${'%' + (category ?? '') + '%'})
-                AND (${(query && !category) ? query : null} IS NULL
-                    OR name        ILIKE ${'%' + (query ?? '') + '%'}
-                    OR description ILIKE ${'%' + (query ?? '') + '%'}
-                    OR category    ILIKE ${'%' + (query ?? '') + '%'})
-            LIMIT 30
-        `
+        let products: Row[]
+        try {
+            products = (await sql`
+                SELECT id, supplier_id, name, description, hs_code, category, min_order_qty, unit, certifications
+                FROM products
+                WHERE supplier_id = ANY(${supplierIds})
+                    AND (${category ?? null} IS NULL OR category ILIKE ${'%' + (category ?? '') + '%'})
+                    AND (${(query && !category) ? query : null} IS NULL
+                        OR name        ILIKE ${'%' + (query ?? '') + '%'}
+                        OR description ILIKE ${'%' + (query ?? '') + '%'}
+                        OR category    ILIKE ${'%' + (query ?? '') + '%'})
+                LIMIT 30
+            `) as unknown as Row[]
+        } catch {
+            return { error: 'Product database is currently unavailable. Please try again later.', results: [] }
+        }
 
         const results = suppliers.map((supplier) => {
             const supplierProducts = products
@@ -94,22 +106,27 @@ export const productLookupTool = tool({
         hsCode: z.string().optional().describe('HS code / tariff code to look up'),
     }),
     execute: async ({ name, category, hsCode }) => {
-        const products = await sql`
-            SELECT
-                p.id, p.name, p.description, p.hs_code, p.category,
-                p.min_order_qty, p.unit, p.certifications,
-                p.supplier_id,
-                s.company_name AS supplier_name,
-                s.verified     AS supplier_verified,
-                s.certifications AS supplier_certifications
-            FROM products p
-            JOIN suppliers s ON s.id = p.supplier_id
-            WHERE
-                (${name ?? null} IS NULL OR p.name ILIKE ${'%' + (name ?? '') + '%'})
-                AND (${category ?? null} IS NULL OR p.category ILIKE ${'%' + (category ?? '') + '%'})
-                AND (${hsCode ?? null} IS NULL OR p.hs_code ILIKE ${'%' + (hsCode ?? '') + '%'})
-            LIMIT 15
-        `
+        let products: Row[]
+        try {
+            products = (await sql`
+                SELECT
+                    p.id, p.name, p.description, p.hs_code, p.category,
+                    p.min_order_qty, p.unit, p.certifications,
+                    p.supplier_id,
+                    s.company_name AS supplier_name,
+                    s.verified     AS supplier_verified,
+                    s.certifications AS supplier_certifications
+                FROM products p
+                JOIN suppliers s ON s.id = p.supplier_id
+                WHERE
+                    (${name ?? null} IS NULL OR p.name ILIKE ${'%' + (name ?? '') + '%'})
+                    AND (${category ?? null} IS NULL OR p.category ILIKE ${'%' + (category ?? '') + '%'})
+                    AND (${hsCode ?? null} IS NULL OR p.hs_code ILIKE ${'%' + (hsCode ?? '') + '%'})
+                LIMIT 15
+            `) as unknown as Row[]
+        } catch {
+            return { error: 'Product database is currently unavailable. Please try again later.', results: [] }
+        }
 
         if (products.length === 0) {
             return { message: 'No products found matching your criteria.', results: [] }
