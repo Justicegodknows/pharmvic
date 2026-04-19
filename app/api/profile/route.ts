@@ -14,14 +14,15 @@ export async function GET(): Promise<Response> {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    let profile: unknown
+    type ProfileRow = Record<string, unknown>
+    let profile: ProfileRow | undefined
     try {
-        ;[profile] = await sql`
+        ;[profile] = (await sql`
             SELECT id, email, full_name, role, company_name, country, phone, avatar_url, created_at
             FROM profiles
             WHERE id = ${user.id}
             LIMIT 1
-        `
+        `) as unknown as ProfileRow[]
     } catch {
         return NextResponse.json({ error: 'Database unavailable' }, { status: 503 })
     }
@@ -51,9 +52,10 @@ export async function PATCH(request: Request): Promise<Response> {
         phone?: string
     }
 
-    let profile: unknown
+    type ProfileRow = Record<string, unknown>
+    let profile: ProfileRow | undefined
     try {
-        ;[profile] = await sql`
+        ;[profile] = (await sql`
             UPDATE profiles SET
                 full_name    = COALESCE(${body.full_name ?? null}, full_name),
                 company_name = COALESCE(${body.company_name ?? null}, company_name),
@@ -62,7 +64,7 @@ export async function PATCH(request: Request): Promise<Response> {
                 updated_at   = now()
             WHERE id = ${user.id}
             RETURNING id, email, full_name, role, company_name, country, phone, avatar_url
-        `
+        `) as unknown as ProfileRow[]
     } catch {
         return NextResponse.json({ error: 'Database unavailable' }, { status: 503 })
     }

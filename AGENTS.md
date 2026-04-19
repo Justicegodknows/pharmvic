@@ -263,7 +263,7 @@ app/lib/crawl-nafdac-zyte.ts  — Orchestrator script (batching, retry, logging)
 POST /api/agent/knowledge     — Ingest endpoint (requires RAG_ADMIN_API_KEY)
       │
       ▼
-app/lib/rag-ingest.ts         — chunkText → generateEmbeddings (Ollama) → pgvector
+app/lib/rag-ingest.ts         — chunkText → generateEmbeddings (HuggingFace /v1/embeddings) → pgvector
       │
       ▼
 Docker PostgreSQL              — knowledge_documents + document_chunks (vector(1024))
@@ -301,7 +301,7 @@ Default run uses `MIN_PRIORITY=2` — targets ~regulatory + informational pages.
 | `app/lib/nafdac-sitemap.ts` | WordPress sitemap parser + URL scoring |
 | `app/lib/crawl-nafdac-zyte.ts` | Main crawler/ingestion orchestrator |
 | `app/lib/rag-ingest.ts` | Chunk → embed → pgvector pipeline |
-| `app/lib/embeddings.ts` | Ollama `nomic-embed-text` (1024-dim vectors) |
+| `app/lib/embeddings.ts` | HuggingFace Inference API `/v1/embeddings` — `mixedbread-ai/mxbai-embed-large-v1` (1024-dim vectors) |
 | `app/lib/tools/knowledge-base.ts` | Agent RAG retrieval tool (cosine similarity) |
 
 ---

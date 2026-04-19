@@ -38,7 +38,7 @@ export default async function DashboardLayout({
     children: ReactNode
 }): Promise<ReactElement> {
     let user = null
-    let profile = null
+    let profile: { role: string; full_name: string | null; company_name: string | null } | null = null
     try {
         const supabase = await createClient()
         const { data } = await supabase.auth.getUser()
@@ -49,13 +49,14 @@ export default async function DashboardLayout({
         redirect('/auth/login?redirect=/dashboard')
     }
 
+    type ProfileRow = { role: string; full_name: string | null; company_name: string | null }
     try {
-        ;[profile] = await sql`
+        ;[profile] = (await sql`
             SELECT role, full_name, company_name
             FROM profiles
             WHERE id = ${user.id}
             LIMIT 1
-        `
+        `) as unknown as ProfileRow[]
     } catch { }
 
     const navItems = profile?.role === 'supplier' ? SUPPLIER_NAV : VENDOR_NAV

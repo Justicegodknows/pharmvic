@@ -3,13 +3,14 @@ import sql from '@/lib/db/client'
 import { NextResponse } from 'next/server'
 
 export async function GET(): Promise<Response> {
-    let suppliers: unknown[]
+    type SupplierRow = Record<string, unknown>
+    let suppliers: SupplierRow[] = []
     try {
-        suppliers = await sql`
+        suppliers = (await sql`
             SELECT id, company_name, description, certifications, verified, logo_url, country
             FROM suppliers
             ORDER BY verified DESC, company_name ASC
-        `
+        `) as unknown as SupplierRow[]
     } catch {
         return NextResponse.json({ error: 'Database unavailable' }, { status: 503 })
     }
@@ -40,9 +41,10 @@ export async function POST(request: Request): Promise<Response> {
         return NextResponse.json({ error: 'company_name required' }, { status: 400 })
     }
 
-    let data: unknown
+    type SupplierRow = Record<string, unknown>
+    let data: SupplierRow | undefined
     try {
-        ;[data] = await sql`
+        ;[data] = (await sql`
             INSERT INTO suppliers (
                 user_id, company_name, description, address, website,
                 founded_year, export_markets, certifications
@@ -57,10 +59,10 @@ export async function POST(request: Request): Promise<Response> {
                 ${body.certifications ?? []}
             )
             RETURNING *
-        `
+        `) as unknown as SupplierRow[]
     } catch {
         return NextResponse.json({ error: 'Database unavailable' }, { status: 503 })
     }
 
-    return NextResponse.json(data, { status: 201 })
+    return NextResponse.json(data ?? null, { status: 201 })
 }

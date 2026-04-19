@@ -25,15 +25,16 @@ export async function GET(): Promise<Response> {
         return NextResponse.json({ error: 'Vendor not found' }, { status: 404 })
     }
 
-    let inquiries: unknown[]
+    type InquiryRow = Record<string, unknown>
+    let inquiries: InquiryRow[] = []
     try {
-        inquiries = await sql`
+        inquiries = (await sql`
             SELECT i.*, s.company_name AS supplier_company_name
             FROM inquiries i
             JOIN suppliers s ON s.id = i.supplier_id
             WHERE i.vendor_id = ${vendor.id}
             ORDER BY i.created_at DESC
-        `
+        `) as unknown as InquiryRow[]
     } catch {
         return NextResponse.json({ error: 'Database unavailable' }, { status: 503 })
     }
@@ -72,13 +73,14 @@ export async function POST(request: Request): Promise<Response> {
         return NextResponse.json({ error: 'Vendor record not found' }, { status: 404 })
     }
 
-    let data: unknown
+    type InquiryRow = Record<string, unknown>
+    let data: InquiryRow | undefined
     try {
-        ;[data] = await sql`
+        ;[data] = (await sql`
             INSERT INTO inquiries (vendor_id, supplier_id, subject, message)
             VALUES (${vendor.id}, ${body.supplier_id}, ${body.subject}, ${body.message})
             RETURNING *
-        `
+        `) as unknown as InquiryRow[]
     } catch {
         return NextResponse.json({ error: 'Database unavailable' }, { status: 503 })
     }

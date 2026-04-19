@@ -29,13 +29,14 @@ export async function GET(): Promise<Response> {
         return NextResponse.json({ error: 'Vendor not found' }, { status: 404 })
     }
 
-    let documents: unknown[]
+    type DocRow = Record<string, unknown>
+    let documents: DocRow[] = []
     try {
-        documents = await sql`
+        documents = (await sql`
             SELECT * FROM documents
             WHERE vendor_id = ${vendor.id}
             ORDER BY uploaded_at DESC
-        `
+        `) as unknown as DocRow[]
     } catch {
         return NextResponse.json({ error: 'Database unavailable' }, { status: 503 })
     }
@@ -51,11 +52,12 @@ export async function POST(request: Request): Promise<Response> {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    let vendor: { id: string } | undefined
+    type VendorRow = { id: string }
+    let vendor: VendorRow | undefined
     try {
-        ;[vendor] = await sql`
+        ;[vendor] = (await sql`
             SELECT id FROM vendors WHERE user_id = ${user.id} LIMIT 1
-        `
+        `) as unknown as VendorRow[]
     } catch {
         return NextResponse.json({ error: 'Database unavailable' }, { status: 503 })
     }
@@ -80,13 +82,14 @@ export async function POST(request: Request): Promise<Response> {
     const buffer = Buffer.from(await file.arrayBuffer())
     await writeFile(absolutePath, buffer)
 
-    let doc: unknown
+    type DocRow = Record<string, unknown>
+    let doc: DocRow | undefined
     try {
-        ;[doc] = await sql`
+        ;[doc] = (await sql`
             INSERT INTO documents (vendor_id, doc_type, file_name, file_path, file_size)
             VALUES (${vendor.id}, ${docType}, ${file.name}, ${relativePath}, ${file.size})
             RETURNING *
-        `
+        `) as unknown as DocRow[]
     } catch {
         return NextResponse.json({ error: 'Database unavailable' }, { status: 503 })
     }
@@ -108,32 +111,34 @@ export async function DELETE(request: Request): Promise<Response> {
         return NextResponse.json({ error: 'id required' }, { status: 400 })
     }
 
-    let vendor: { id: string } | undefined
+    type VendorRow2 = { id: string }
+    let vendor2: VendorRow2 | undefined
     try {
-        ;[vendor] = await sql`
+        ;[vendor2] = (await sql`
             SELECT id FROM vendors WHERE user_id = ${user.id} LIMIT 1
-        `
+        `) as unknown as VendorRow2[]
     } catch {
         return NextResponse.json({ error: 'Database unavailable' }, { status: 503 })
     }
 
-    if (!vendor) {
+    if (!vendor2) {
         return NextResponse.json({ error: 'Vendor not found' }, { status: 404 })
     }
 
     // Fetch the record first to get the file path, and verify ownership
-    let doc: { id: string; file_path: string } | undefined
+    type DocDeleteRow = { id: string; file_path: string }
+    let doc2: DocDeleteRow | undefined
     try {
-        ;[doc] = await sql`
+        ;[doc2] = (await sql`
             SELECT id, file_path FROM documents
-            WHERE id = ${id} AND vendor_id = ${vendor.id}
+            WHERE id = ${id} AND vendor_id = ${vendor2.id}
             LIMIT 1
-        `
+        `) as unknown as DocDeleteRow[]
     } catch {
         return NextResponse.json({ error: 'Database unavailable' }, { status: 503 })
     }
 
-    if (!doc) {
+    if (!doc2) {
         return NextResponse.json({ error: 'Document not found' }, { status: 404 })
     }
 
@@ -145,7 +150,7 @@ export async function DELETE(request: Request): Promise<Response> {
     }
 
     try {
-        await unlink(join(UPLOADS_DIR, doc.file_path as string))
+        await unlink(join(UPLOADS_DIR, doc2.file_path))
     } catch {
         // File may already be gone; don't fail the request
     }
