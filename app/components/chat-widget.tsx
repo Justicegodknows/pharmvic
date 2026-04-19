@@ -7,6 +7,7 @@ import { Card } from '@/components/ui/card'
 import { Textarea } from '@/components/ui/textarea'
 import { MessageSquareIcon, XIcon, SendIcon, MinimizeIcon } from 'lucide-react'
 import { useState, useRef, type FormEvent, type KeyboardEvent, type ReactElement } from 'react'
+import { Streamdown } from 'streamdown'
 
 const transport = new DefaultChatTransport({
     api: '/api/agent/chat',
@@ -89,7 +90,13 @@ export function ChatWidget(): ReactElement {
                         >
                             {msg.parts.map((part, i) =>
                                 part.type === 'text' ? (
-                                    <span key={i} className="whitespace-pre-wrap">{part.text}</span>
+                                    <Streamdown
+                                        key={i}
+                                        animated
+                                        isAnimating={status === 'streaming'}
+                                    >
+                                        {part.text}
+                                    </Streamdown>
                                 ) : null
                             )}
                         </div>

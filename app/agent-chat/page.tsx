@@ -28,6 +28,7 @@ import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { MessageSquareIcon, SendIcon } from 'lucide-react'
 import { useState, useRef, type FormEvent, type ReactElement, type KeyboardEvent } from 'react'
+import { Streamdown } from 'streamdown'
 
 const TOOL_LABELS: Record<string, string> = {
     searchKnowledgeBase: 'Searching knowledge base',
@@ -171,7 +172,13 @@ export default function AgentChatPage(): ReactElement {
                                     {message.parts.map((part, index) => {
                                         if (part.type === 'text') {
                                             return (
-                                                <div key={index} className="whitespace-pre-wrap">{part.text}</div>
+                                                <Streamdown
+                                                    key={index}
+                                                    animated
+                                                    isAnimating={status === 'streaming'}
+                                                >
+                                                    {part.text}
+                                                </Streamdown>
                                             )
                                         }
                                         if (isToolUIPart(part)) {
