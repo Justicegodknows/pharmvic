@@ -46,9 +46,13 @@ echo "${DO_REGISTRY_TOKEN}" | docker login "${REGISTRY}" \
     --password-stdin
 
 # ── 3. Build ──────────────────────────────────────────────────────────────────
+# NEXT_PUBLIC_* vars must be present at build time — they are baked into the
+# compiled JS bundle by Next.js and cannot be injected at container runtime.
 echo "→ Building ${FULL_IMAGE}:${TAG}..."
 docker build \
     --platform linux/amd64 \
+    --build-arg NEXT_PUBLIC_SUPABASE_URL="${NEXT_PUBLIC_SUPABASE_URL:-}" \
+    --build-arg NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY="${NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY:-}" \
     --tag "${FULL_IMAGE}:${TAG}" \
     "$(dirname "$0")/.."
 
