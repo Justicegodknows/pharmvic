@@ -30,7 +30,7 @@ interface FileTreeContextType {
 
 // Default noop for context default value
 // oxlint-disable-next-line eslint(no-empty-function)
-const noop = () => {};
+const noop = () => { };
 
 const FileTreeContext = createContext<FileTreeContextType>({
   // oxlint-disable-next-line eslint-plugin-unicorn(no-new-builtin)
@@ -166,6 +166,7 @@ export const FileTreeFolder = ({
         <div
           className={cn("", className)}
           role="treeitem"
+          aria-selected={isSelected ?? false}
           tabIndex={0}
           {...props}
         >
@@ -265,6 +266,7 @@ export const FileTreeFile = ({
         onClick={handleClick}
         onKeyDown={handleKeyDown}
         role="treeitem"
+        aria-selected={isSelected ?? false}
         tabIndex={0}
         {...props}
       >

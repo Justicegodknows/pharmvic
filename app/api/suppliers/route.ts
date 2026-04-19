@@ -3,11 +3,16 @@ import sql from '@/lib/db/client'
 import { NextResponse } from 'next/server'
 
 export async function GET(): Promise<Response> {
-    const suppliers = await sql`
-        SELECT id, company_name, description, certifications, verified, logo_url, country
-        FROM suppliers
-        ORDER BY verified DESC, company_name ASC
-    `
+    let suppliers: unknown[]
+    try {
+        suppliers = await sql`
+            SELECT id, company_name, description, certifications, verified, logo_url, country
+            FROM suppliers
+            ORDER BY verified DESC, company_name ASC
+        `
+    } catch {
+        return NextResponse.json({ error: 'Database unavailable' }, { status: 503 })
+    }
 
     return NextResponse.json(suppliers)
 }
@@ -35,22 +40,27 @@ export async function POST(request: Request): Promise<Response> {
         return NextResponse.json({ error: 'company_name required' }, { status: 400 })
     }
 
-    const [data] = await sql`
-        INSERT INTO suppliers (
-            user_id, company_name, description, address, website,
-            founded_year, export_markets, certifications
-        ) VALUES (
-            ${user.id},
-            ${body.company_name},
-            ${body.description ?? null},
-            ${body.address ?? null},
-            ${body.website ?? null},
-            ${body.founded_year ?? null},
-            ${body.export_markets ?? []},
-            ${body.certifications ?? []}
-        )
-        RETURNING *
-    `
+    let data: unknown
+    try {
+        ;[data] = await sql`
+            INSERT INTO suppliers (
+                user_id, company_name, description, address, website,
+                founded_year, export_markets, certifications
+            ) VALUES (
+                ${user.id},
+                ${body.company_name},
+                ${body.description ?? null},
+                ${body.address ?? null},
+                ${body.website ?? null},
+                ${body.founded_year ?? null},
+                ${body.export_markets ?? []},
+                ${body.certifications ?? []}
+            )
+            RETURNING *
+        `
+    } catch {
+        return NextResponse.json({ error: 'Database unavailable' }, { status: 503 })
+    }
 
     return NextResponse.json(data, { status: 201 })
 }

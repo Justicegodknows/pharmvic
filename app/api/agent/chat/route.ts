@@ -1,6 +1,6 @@
 import { convertToModelMessages, streamText, stepCountIs, type UIMessage, type Tool } from 'ai'
 import { getModel, checkLLMHealth } from '@/app/lib/ai'
-import { PHARMAGENT_SYSTEM_PROMPT, buildSystemPrompt } from '@/app/lib/pharmagent-system-prompt'
+import { buildSystemPrompt } from '@/app/lib/pharmagent-system-prompt'
 import {
     knowledgeBaseTool,
     webSearchTool,

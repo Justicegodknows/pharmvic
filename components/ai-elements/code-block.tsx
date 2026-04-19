@@ -102,8 +102,8 @@ const LineSpan = ({
     {keyedLine.tokens.length === 0
       ? "\n"
       : keyedLine.tokens.map(({ token, key }) => (
-          <TokenSpan key={key} token={token} />
-        ))}
+        <TokenSpan key={key} token={token} />
+      ))}
   </span>
 );
 
@@ -172,11 +172,11 @@ const createRawTokens = (code: string): TokenizedCode => ({
     line === ""
       ? []
       : [
-          {
-            color: "inherit",
-            content: line,
-          } as ThemedToken,
-        ]
+        {
+          color: "inherit",
+          content: line,
+        } as ThemedToken,
+      ]
   ),
 });
 
@@ -389,25 +389,25 @@ export const CodeBlockContent = ({
     [code, language, rawTokens]
   );
 
-  // Async highlighting result (populated after shiki loads)
-  const [asyncTokens, setAsyncTokens] = useState<TokenizedCode | null>(null);
-  const asyncKeyRef = useRef({ code, language });
+  // Async highlighting result keyed by the current code+language to avoid stale tokens
+  const [asyncData, setAsyncData] = useState<{
+    code: string;
+    language: string;
+    tokens: TokenizedCode;
+  } | null>(null);
 
-  // Invalidate stale async tokens synchronously during render
-  if (
-    asyncKeyRef.current.code !== code ||
-    asyncKeyRef.current.language !== language
-  ) {
-    asyncKeyRef.current = { code, language };
-    setAsyncTokens(null);
-  }
+  // Derive asyncTokens without touching a ref during render
+  const asyncTokens =
+    asyncData?.code === code && asyncData?.language === language
+      ? asyncData.tokens
+      : null;
 
   useEffect(() => {
     let cancelled = false;
 
     highlightCode(code, language, (result) => {
       if (!cancelled) {
-        setAsyncTokens(result);
+        setAsyncData({ code, language, tokens: result });
       }
     });
 

@@ -8,35 +8,41 @@ export async function GET(request: Request): Promise<Response> {
     const redirect = searchParams.get('redirect') ?? '/dashboard'
 
     if (code) {
-        const supabase = await createClient()
-        const { error, data } = await supabase.auth.exchangeCodeForSession(code)
+        try {
+            const supabase = await createClient()
+            const { error, data } = await supabase.auth.exchangeCodeForSession(code)
 
-        if (!error && data.user) {
-            const user = data.user
-            const meta = user.user_metadata as {
-                full_name?: string
-                role?: string
-                company_name?: string
+            if (!error && data.user) {
+                const user = data.user
+                const meta = user.user_metadata as {
+                    full_name?: string
+                    role?: string
+                    company_name?: string
+                }
+
+                const role = meta.role ?? 'vendor'
+                const country = role === 'supplier' ? 'Germany' : 'Nigeria'
+
+                // Create profile in Docker PostgreSQL (idempotent — ignore if already exists)
+                try {
+                    await sql`
+                        INSERT INTO profiles (id, email, full_name, role, company_name, country)
+                        VALUES (
+                            ${user.id},
+                            ${user.email ?? ''},
+                            ${meta.full_name ?? ''},
+                            ${role},
+                            ${meta.company_name ?? ''},
+                            ${country}
+                        )
+                        ON CONFLICT (id) DO NOTHING
+                    `
+                } catch { }
+
+                return NextResponse.redirect(`${origin}${redirect}`)
             }
-
-            const role = meta.role ?? 'vendor'
-            const country = role === 'supplier' ? 'Germany' : 'Nigeria'
-
-            // Create profile in Docker PostgreSQL (idempotent — ignore if already exists)
-            await sql`
-                INSERT INTO profiles (id, email, full_name, role, company_name, country)
-                VALUES (
-                    ${user.id},
-                    ${user.email ?? ''},
-                    ${meta.full_name ?? ''},
-                    ${role},
-                    ${meta.company_name ?? ''},
-                    ${country}
-                )
-                ON CONFLICT (id) DO NOTHING
-            `
-
-            return NextResponse.redirect(`${origin}${redirect}`)
+        } catch {
+            // fall through to error redirect
         }
     }
 

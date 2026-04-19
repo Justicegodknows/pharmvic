@@ -14,12 +14,17 @@ export async function GET(): Promise<Response> {
         return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const [profile] = await sql`
-        SELECT id, email, full_name, role, company_name, country, phone, avatar_url, created_at
-        FROM profiles
-        WHERE id = ${user.id}
-        LIMIT 1
-    `
+    let profile: unknown
+    try {
+        ;[profile] = await sql`
+            SELECT id, email, full_name, role, company_name, country, phone, avatar_url, created_at
+            FROM profiles
+            WHERE id = ${user.id}
+            LIMIT 1
+        `
+    } catch {
+        return NextResponse.json({ error: 'Database unavailable' }, { status: 503 })
+    }
 
     if (!profile) {
         return NextResponse.json({ error: 'Profile not found' }, { status: 404 })
@@ -46,16 +51,21 @@ export async function PATCH(request: Request): Promise<Response> {
         phone?: string
     }
 
-    const [profile] = await sql`
-        UPDATE profiles SET
-            full_name    = COALESCE(${body.full_name ?? null}, full_name),
-            company_name = COALESCE(${body.company_name ?? null}, company_name),
-            country      = COALESCE(${body.country ?? null}, country),
-            phone        = COALESCE(${body.phone ?? null}, phone),
-            updated_at   = now()
-        WHERE id = ${user.id}
-        RETURNING id, email, full_name, role, company_name, country, phone, avatar_url
-    `
+    let profile: unknown
+    try {
+        ;[profile] = await sql`
+            UPDATE profiles SET
+                full_name    = COALESCE(${body.full_name ?? null}, full_name),
+                company_name = COALESCE(${body.company_name ?? null}, company_name),
+                country      = COALESCE(${body.country ?? null}, country),
+                phone        = COALESCE(${body.phone ?? null}, phone),
+                updated_at   = now()
+            WHERE id = ${user.id}
+            RETURNING id, email, full_name, role, company_name, country, phone, avatar_url
+        `
+    } catch {
+        return NextResponse.json({ error: 'Database unavailable' }, { status: 503 })
+    }
 
     return NextResponse.json(profile)
 }

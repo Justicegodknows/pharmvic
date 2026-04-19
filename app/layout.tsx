@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { Navbar } from "@/app/components/navbar";
 import { Footer } from "@/app/components/footer";
 import { ChatWidget } from "@/app/components/chat-widget";
+import { ErrorBoundary } from "@/app/components/ErrorBoundary";
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -37,7 +38,9 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <Navbar />
-        <main className="flex-1">{children}</main>
+        <ErrorBoundary>
+          <main className="flex-1">{children}</main>
+        </ErrorBoundary>
         <Footer />
         <ChatWidget />
       </body>

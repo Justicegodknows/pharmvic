@@ -37,21 +37,26 @@ export default async function DashboardLayout({
 }: {
     children: ReactNode
 }): Promise<ReactElement> {
-    // Auth only via Supabase
-    const supabase = await createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    let user = null
+    let profile = null
+    try {
+        const supabase = await createClient()
+        const { data } = await supabase.auth.getUser()
+        user = data.user
+    } catch { }
 
     if (!user) {
         redirect('/auth/login?redirect=/dashboard')
     }
 
-    // Profile from Docker DB
-    const [profile] = await sql`
-        SELECT role, full_name, company_name
-        FROM profiles
-        WHERE id = ${user.id}
-        LIMIT 1
-    `
+    try {
+        ;[profile] = await sql`
+            SELECT role, full_name, company_name
+            FROM profiles
+            WHERE id = ${user.id}
+            LIMIT 1
+        `
+    } catch { }
 
     const navItems = profile?.role === 'supplier' ? SUPPLIER_NAV : VENDOR_NAV
 

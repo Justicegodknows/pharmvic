@@ -206,7 +206,7 @@ export default function AgentChatPage(): ReactElement {
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder="Ask PharmAgent a question..."
-                    className="min-h-[48px] resize-none"
+                    className="min-h-12 resize-none"
                     rows={1}
                     disabled={isLoading}
                 />

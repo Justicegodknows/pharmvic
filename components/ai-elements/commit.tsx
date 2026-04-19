@@ -163,15 +163,16 @@ export const CommitTimestamp = ({
   children,
   ...props
 }: CommitTimestampProps) => {
-  const [formatted, setFormatted] = useState("");
-
-  const updateFormatted = useCallback(() => {
-    setFormatted(formatRelativeDate(date));
-  }, [date]);
+  const [formatted, setFormatted] = useState(() => formatRelativeDate(date));
 
   useEffect(() => {
-    updateFormatted();
-  }, [updateFormatted]);
+    // Use a timer to keep the relative timestamp fresh
+    setFormatted(formatRelativeDate(date));
+    const id = setInterval(() => {
+      setFormatted(formatRelativeDate(date));
+    }, 60_000);
+    return () => clearInterval(id);
+  }, [date]);
 
   return (
     <time

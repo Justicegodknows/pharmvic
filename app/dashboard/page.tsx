@@ -56,66 +56,66 @@ export default async function DashboardPage(): Promise<ReactElement> {
     return (
         <div>
             <div className="mb-8">
-                <h1 className="font-headline text-3xl font-extrabold text-[#000F22]">
+                <h1 className="font-headline text-3xl font-extrabold text-ci-primary">
                     Welcome, {profile?.full_name || 'User'}
                 </h1>
-                <p className="mt-1 text-[#43474D]">
+                <p className="mt-1 text-ci-on-surface-variant">
                     {profile?.company_name} &middot;{' '}
-                    <span className="inline-block bg-[#79F6F5]/20 text-[#007070] text-xs font-bold px-2 py-0.5 rounded capitalize">{profile?.role}</span>
+                    <span className="inline-block bg-ci-secondary-container/20 text-ci-on-secondary-container text-xs font-bold px-2 py-0.5 rounded capitalize">{profile?.role}</span>
                 </p>
             </div>
 
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                 <Link href="/dashboard/inquiries">
-                    <div className="bg-white p-6 rounded-xl border border-[#C4C6CE]/15 transition-colors hover:bg-[#F2F4F6]">
+                    <div className="bg-white p-6 rounded-xl border border-ci-outline-variant/15 transition-colors hover:bg-ci-surface-low">
                         <div className="flex justify-between items-start mb-4">
-                            <span className="bg-[#79F6F5]/30 text-[#006A6A] p-2 rounded-lg">
+                            <span className="bg-ci-secondary-container/30 text-ci-secondary p-2 rounded-lg">
                                 <InboxIcon className="h-5 w-5" />
                             </span>
                         </div>
-                        <p className="text-[#43474D] text-sm font-medium">Inquiries</p>
-                        <h2 className="text-4xl font-headline font-bold text-[#000F22] mt-1">{inquiryCount}</h2>
+                        <p className="text-ci-on-surface-variant text-sm font-medium">Inquiries</p>
+                        <h2 className="text-4xl font-headline font-bold text-ci-primary mt-1">{inquiryCount}</h2>
                     </div>
                 </Link>
 
                 {isVendor && (
                     <Link href="/dashboard/documents">
-                        <div className="bg-white p-6 rounded-xl border border-[#C4C6CE]/15 transition-colors hover:bg-[#F2F4F6]">
+                        <div className="bg-white p-6 rounded-xl border border-ci-outline-variant/15 transition-colors hover:bg-ci-surface-low">
                             <div className="flex justify-between items-start mb-4">
-                                <span className="bg-[#79F6F5]/30 text-[#006A6A] p-2 rounded-lg">
+                                <span className="bg-ci-secondary-container/30 text-ci-secondary p-2 rounded-lg">
                                     <FileTextIcon className="h-5 w-5" />
                                 </span>
                             </div>
-                            <p className="text-[#43474D] text-sm font-medium">Documents</p>
-                            <h2 className="text-4xl font-headline font-bold text-[#000F22] mt-1">{documentCount}</h2>
+                            <p className="text-ci-on-surface-variant text-sm font-medium">Documents</p>
+                            <h2 className="text-4xl font-headline font-bold text-ci-primary mt-1">{documentCount}</h2>
                         </div>
                     </Link>
                 )}
 
                 {isSupplier && (
                     <Link href="/dashboard/products">
-                        <div className="bg-white p-6 rounded-xl border border-[#C4C6CE]/15 transition-colors hover:bg-[#F2F4F6]">
+                        <div className="bg-white p-6 rounded-xl border border-ci-outline-variant/15 transition-colors hover:bg-ci-surface-low">
                             <div className="flex justify-between items-start mb-4">
-                                <span className="bg-[#79F6F5]/30 text-[#006A6A] p-2 rounded-lg">
+                                <span className="bg-ci-secondary-container/30 text-ci-secondary p-2 rounded-lg">
                                     <PackageIcon className="h-5 w-5" />
                                 </span>
                             </div>
-                            <p className="text-[#43474D] text-sm font-medium">Products</p>
-                            <h2 className="text-4xl font-headline font-bold text-[#000F22] mt-1">{productCount}</h2>
+                            <p className="text-ci-on-surface-variant text-sm font-medium">Products</p>
+                            <h2 className="text-4xl font-headline font-bold text-ci-primary mt-1">{productCount}</h2>
                         </div>
                     </Link>
                 )}
 
                 {isVendor && (
                     <Link href="/dashboard/checklist">
-                        <div className="bg-white p-6 rounded-xl border border-[#C4C6CE]/15 transition-colors hover:bg-[#F2F4F6]">
+                        <div className="bg-white p-6 rounded-xl border border-ci-outline-variant/15 transition-colors hover:bg-ci-surface-low">
                             <div className="flex justify-between items-start mb-4">
-                                <span className="bg-[#FFDAD6]/30 text-[#BA1A1A] p-2 rounded-lg">
+                                <span className="bg-ci-error-container/30 text-ci-error p-2 rounded-lg">
                                     <ClipboardCheckIcon className="h-5 w-5" />
                                 </span>
                             </div>
-                            <p className="text-[#43474D] text-sm font-medium">Reg. Checklist</p>
-                            <h2 className="text-4xl font-headline font-bold text-[#000F22] mt-1">&mdash;</h2>
+                            <p className="text-ci-on-surface-variant text-sm font-medium">Reg. Checklist</p>
+                            <h2 className="text-4xl font-headline font-bold text-ci-primary mt-1">&mdash;</h2>
                         </div>
                     </Link>
                 )}
@@ -123,25 +123,25 @@ export default async function DashboardPage(): Promise<ReactElement> {
 
             {/* Quick actions */}
             <div className="mt-8">
-                <h2 className="mb-4 font-headline text-lg font-bold text-[#000F22]">Quick Actions</h2>
+                <h2 className="mb-4 font-headline text-lg font-bold text-ci-primary">Quick Actions</h2>
                 <div className="flex flex-wrap gap-3">
                     {isVendor && (
                         <>
                             <Link
                                 href="/marketplace"
-                                className="rounded-full border border-[#C4C6CE]/30 px-6 py-2 text-sm font-bold text-[#43474D] transition-colors hover:bg-[#F2F4F6]"
+                                className="rounded-full border border-ci-outline-variant/30 px-6 py-2 text-sm font-bold text-ci-on-surface-variant transition-colors hover:bg-ci-surface-low"
                             >
                                 Browse Suppliers
                             </Link>
                             <Link
                                 href="/regulatory-guide"
-                                className="rounded-full border border-[#C4C6CE]/30 px-6 py-2 text-sm font-bold text-[#43474D] transition-colors hover:bg-[#F2F4F6]"
+                                className="rounded-full border border-ci-outline-variant/30 px-6 py-2 text-sm font-bold text-ci-on-surface-variant transition-colors hover:bg-ci-surface-low"
                             >
                                 Regulatory Guide
                             </Link>
                             <Link
                                 href="/agent-chat"
-                                className="rounded-full bg-[#000F22] px-6 py-2 text-sm font-bold text-white hover:opacity-90 transition-all"
+                                className="rounded-full bg-ci-primary px-6 py-2 text-sm font-bold text-white hover:opacity-90 transition-all"
                             >
                                 Ask PharmAgent
                             </Link>
@@ -151,13 +151,13 @@ export default async function DashboardPage(): Promise<ReactElement> {
                         <>
                             <Link
                                 href="/dashboard/products"
-                                className="rounded-full border border-[#C4C6CE]/30 px-6 py-2 text-sm font-bold text-[#43474D] transition-colors hover:bg-[#F2F4F6]"
+                                className="rounded-full border border-ci-outline-variant/30 px-6 py-2 text-sm font-bold text-ci-on-surface-variant transition-colors hover:bg-ci-surface-low"
                             >
                                 Manage Products
                             </Link>
                             <Link
                                 href="/dashboard/profile"
-                                className="rounded-full border border-[#C4C6CE]/30 px-6 py-2 text-sm font-bold text-[#43474D] transition-colors hover:bg-[#F2F4F6]"
+                                className="rounded-full border border-ci-outline-variant/30 px-6 py-2 text-sm font-bold text-ci-on-surface-variant transition-colors hover:bg-ci-surface-low"
                             >
                                 Edit Profile
                             </Link>

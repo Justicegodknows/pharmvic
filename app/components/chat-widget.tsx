@@ -49,7 +49,7 @@ export function ChatWidget(): ReactElement {
     }
 
     return (
-        <Card className="fixed bottom-6 right-6 z-50 flex h-[500px] w-[380px] flex-col overflow-hidden shadow-2xl">
+        <Card className="fixed bottom-6 right-6 z-50 flex h-125 w-95 flex-col overflow-hidden shadow-2xl">
             {/* Header */}
             <div className="flex items-center justify-between border-b border-border bg-primary px-4 py-3">
                 <div className="flex items-center gap-2">
@@ -104,7 +104,7 @@ export function ChatWidget(): ReactElement {
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={handleKeyDown}
                     placeholder="Type a message..."
-                    className="min-h-[36px] resize-none text-sm"
+                    className="min-h-9 resize-none text-sm"
                     rows={1}
                     disabled={isLoading}
                 />

@@ -171,11 +171,14 @@ export const InlineCitationCarouselIndex = ({
       return;
     }
 
-    syncState();
+    // Initialise counts after mount — wrapped in a task to avoid
+    // calling setState synchronously at the top of an effect body.
+    const init = setTimeout(syncState, 0);
 
     api.on("select", syncState);
 
     return () => {
+      clearTimeout(init);
       api.off("select", syncState);
     };
   }, [api, syncState]);
